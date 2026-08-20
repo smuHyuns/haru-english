@@ -1,0 +1,33 @@
+/* 프로토타입 <helmet> 의 키프레임 */
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes logoIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/*
+ * 개발 모드 터치 타깃 점검용 아웃라인.
+ * html[data-touch-audit] 를 켜면 52px 미만 인터랙티브 요소가 빨갛게 표시된다.
+ * (실제 측정은 src/lib/touchAudit.ts 가 런타임에 수행)
+ */
+html[data-touch-audit] [data-touch-violation] {
+  outline: 2px dashed #f76707 !important;
+  outline-offset: -2px;
+}

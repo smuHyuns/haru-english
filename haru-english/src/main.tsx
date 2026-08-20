@@ -3,6 +3,13 @@ import { createRoot } from 'react-dom/client';
 
 import App from './App';
 
+// 폰트는 셀프 호스팅(오프라인 대응). 124개 유니코드 서브셋으로 쪼개져 있어
+// 브라우저가 실제로 쓰는 범위만 내려받는다.
+import '@fontsource-variable/noto-sans-kr';
+import '@/styles/tokens.css';
+import '@/styles/reset.css';
+import '@/styles/global.css';
+
 // 배포 직후, 열려 있던 탭이 사라진 청크를 요청해 백지가 되는 것을 막는다 (mds/05 §4②)
 window.addEventListener('vite:preloadError', (e) => {
   e.preventDefault();

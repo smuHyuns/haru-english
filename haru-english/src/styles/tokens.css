@@ -1,0 +1,122 @@
+/*
+ * 디자인 토큰 — 단일 소스
+ * 출처: design_handoff_daily_english/README.md 의 Design Tokens 표 + 프로토타입 인라인 스타일 실측
+ *
+ * 색 / 라운드 / 간격 / 모션은 여기 변수로. 타이포는 컴포넌트별 확정값으로 쓴다
+ * (46/900 + ls -0.035em + lh 1.1 처럼 값이 한 벌로 묶여 다녀서 쪼개면 대조가 어려워짐).
+ */
+
+:root {
+  /* ── Accent ─────────────────────────────── */
+  --accent: #3182f6; /* 대안: #00b2b2 / #7048e8 / #f76707 */
+  --accent-hover: #1b64da;
+  --accent-soft: #eaf2ff; /* 선택 배경 · 출석일 · 활성 탭 */
+
+  /* ── Text ───────────────────────────────── */
+  --text-1: #191f28; /* primary */
+  --text-2: #4e5968; /* secondary */
+  --text-3: #6b7684; /* tertiary */
+  --text-4: #8b95a1; /* muted */
+  --text-5: #b0b8c1; /* disabled · 비활성 날짜 */
+
+  /* ── Surface / Fill ─────────────────────── */
+  --surface: #ffffff;
+  --surface-raised: #f9fafb; /* 카드 */
+  --fill: #f2f4f6; /* 보조 버튼 · 입력 · divider */
+  --fill-pressed: #e8ebee; /* 회색 버튼 press */
+  --fill-pressed-alt: #eef1f4; /* 흰 버튼 press */
+  --divider: #f2f4f6;
+  --page-bg: #e9ecef; /* html/body (문서 바깥) */
+
+  /* ── Icon / Misc ────────────────────────── */
+  --icon-inactive: #c3cad2; /* ☆ */
+  --arrow-disabled: #dbe0e5; /* 캘린더 화살표 한계 */
+  --dot-inactive: #e1e5ea; /* 시트 점 인디케이터 */
+
+  /* ── Overlay ────────────────────────────── */
+  --scrim: rgba(25, 31, 40, 0.42);
+  --toast-bg: #191f28;
+  --toast-fg: #ffffff;
+
+  /* ── Focus (input) ──────────────────────── */
+  --focus-bg: #edf4ff;
+  --focus-ring: inset 0 0 0 2px var(--accent);
+
+  /* ── Thumbnail placeholder ──────────────── */
+  --thumb-a: #eef1f4;
+  --thumb-b: #e6eaee;
+  --thumb-label: #98a2ad;
+  --thumb-stripe: repeating-linear-gradient(
+    135deg,
+    var(--thumb-a) 0 10px,
+    var(--thumb-b) 10px 20px
+  );
+  --thumb-stripe-sm: repeating-linear-gradient(
+    135deg,
+    var(--thumb-a) 0 8px,
+    var(--thumb-b) 8px 16px
+  );
+
+  /* ── On-accent (스트릭 카드 · 스플래시) ──── */
+  --on-accent: #ffffff;
+  --on-accent-soft: rgba(255, 255, 255, 0.82);
+  --on-accent-faint: rgba(255, 255, 255, 0.8);
+
+  /* ── Radius ─────────────────────────────── */
+  --r-splash-logo: 30px;
+  --r-sheet: 26px; /* 시트 상단 (26px 26px 0 0) */
+  --r-card-lg: 24px; /* 큰 카드 · 스트릭 · 캘린더 */
+  --r-logo-login: 22px;
+  --r-card: 20px; /* 썸네일 카드 · 빈 상태 · 시트 단어 카드 */
+  --r-btn: 18px; /* 버튼 · 리스트 카드 */
+  --r-input: 16px; /* 입력 · 아이콘 버튼 · 내부 카드 */
+  --r-sm: 14px; /* 시트 내부 카드 · 작은 버튼 */
+  --r-xs: 12px; /* 리스트 썸네일 · 캘린더 셀 · 세그먼트 */
+  --r-pill: 999px;
+
+  /* ── Spacing ────────────────────────────── */
+  --sp-4: 4px;
+  --sp-6: 6px;
+  --sp-8: 8px;
+  --sp-10: 10px;
+  --sp-12: 12px;
+  --sp-14: 14px;
+  --sp-16: 16px;
+  --sp-18: 18px;
+  --sp-20: 20px;
+  --sp-22: 22px;
+  --sp-24: 24px;
+  --sp-26: 26px;
+  --sp-28: 28px;
+  --sp-32: 32px;
+
+  --pad-screen: 20px; /* 화면 좌우 */
+  --pad-login: 24px;
+  --gap-section: 22px; /* 섹션 간 22~28 */
+  --gap-list: 10px; /* 리스트 항목 간 */
+
+  /* ── Elevation ──────────────────────────── */
+  --shadow-tabbar: 0 -1px 0 var(--divider);
+
+  /* ── Motion ─────────────────────────────── */
+  --dur-rise: 0.22s; /* 토스트 */
+  --dur-sheet: 0.24s; /* 바텀시트 */
+  --dur-logo: 0.45s; /* 스플래시 로고 */
+  --ease: ease-out;
+
+  /* ── Type ───────────────────────────────── */
+  --font: 'Noto Sans KR Variable', 'Noto Sans KR', system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
+  --ls-base: -0.02em;
+
+  /* ── Layout ─────────────────────────────── */
+  --tabbar-pad-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-rise: 0.01s;
+    --dur-sheet: 0.01s;
+    --dur-logo: 0.01s;
+  }
+}
