@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #e9ecef; -webkit-font-smoothing: antialiased; }
+  #root { height: 100%; }
+  * { box-sizing: border-box; }
+  a { color: #3182f6; text-decoration: none; }
+  a:hover { color: #1b64da; }
+  input { font-family: inherit; }
+  ::-webkit-scrollbar { width: 0; }
+  @keyframes riseIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes logoIn { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: scale(1); } }
+</style>
+</helmet>
+<div style="width: 100%; height: 100dvh; max-height: 100%; min-height: 0; display: flex; flex-direction: column; background: #fff; color: #191f28; font-family: 'Noto Sans KR', system-ui, sans-serif; overflow: hidden; position: relative; letter-spacing: -0.02em">
+
+  <sc-if value="{{ isSplash }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ toLogin }}" style="position: absolute; inset: 0; z-index: 20; background: {{ accent }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; cursor: pointer">
+      <div style="width: 104px; height: 104px; border-radius: 30px; background: #fff; display: flex; align-items: center; justify-content: center; animation: logoIn 0.45s ease-out">
+        <span style="font-size: 46px; font-weight: 900; letter-spacing: -0.06em; color: {{ accent }}">EN</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+        <span style="font-size: 30px; font-weight: 900; color: #fff; letter-spacing: -0.04em">하루영어</span>
+        <span style="font-size: 16px; font-weight: 500; color: rgba(255,255,255,0.8)">매일 한 단어, 매일 한 영상</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; z-index: 19; background: #fff; display: flex; flex-direction: column; padding: 56px 24px 32px">
+      <div style="flex: 0 0 auto; display: flex; flex-direction: column; gap: 16px">
+        <div style="width: 68px; height: 68px; border-radius: 22px; background: {{ accent }}; display: flex; align-items: center; justify-content: center">
+          <span style="font-size: 28px; font-weight: 900; letter-spacing: -0.06em; color: #fff">EN</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 30px; font-weight: 900; letter-spacing: -0.04em; line-height: 1.25">하루영어에<br>오신 것을 환영해요</span>
+          <span style="font-size: 17px; color: #8b95a1; line-height: 1.5">로그인하면 즐겨찾기와 출석이<br>계속 저장돼요.</span>
+        </div>
+      </div>
+
+      <div style="flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 32px 0">
+        <input value="{{ loginId }}" onChange="{{ setLoginId }}" placeholder="아이디 또는 휴대폰 번호" style="height: 68px; border: none; border-radius: 16px; background: #f2f4f6; padding: 0 18px; font-size: 18px; font-weight: 500; color: #191f28; outline: none" style-focus="background: #edf4ff; box-shadow: inset 0 0 0 2px #3182f6">
+        <input value="{{ loginPw }}" onChange="{{ setLoginPw }}" type="password" placeholder="비밀번호" style="height: 68px; border: none; border-radius: 16px; background: #f2f4f6; padding: 0 18px; font-size: 18px; font-weight: 500; color: #191f28; outline: none" style-focus="background: #edf4ff; box-shadow: inset 0 0 0 2px #3182f6">
+      </div>
+
+      <div style="flex: 0 0 auto; display: flex; flex-direction: column; gap: 10px">
+        <button type="button" onClick="{{ login }}" style="height: 76px; border: none; border-radius: 18px; background: {{ accent }}; color: #fff; font-family: inherit; font-size: 23px; font-weight: 700; letter-spacing: -0.02em; cursor: pointer" style-active="opacity: 0.82">로그인</button>
+        <button type="button" onClick="{{ login }}" style="height: 68px; border: none; border-radius: 18px; background: #f2f4f6; color: #4e5968; font-family: inherit; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; cursor: pointer" style-active="background: #e8ebee">로그인 없이 둘러보기</button>
+        <span style="text-align: center; font-size: 16px; color: #8b95a1; padding-top: 6px">처음이신가요? <a href="#" onClick="{{ soon }}">회원가입</a></span>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="flex: 0 0 auto; padding: 22px 20px 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+    <span style="font-size: 26px; font-weight: 700">{{ screenTitle }}</span>
+    <span style="font-size: 15px; font-weight: 500; color: #8b95a1; background: #f2f4f6; padding: 9px 14px; border-radius: 999px; white-space: nowrap">{{ today }}</span>
+  </div>
+
+  <div style="flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 8px 20px 28px; display: flex; flex-direction: column">
+
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 28px">
+        <div style="display: flex; flex-direction: column; gap: 20px; background: #f9fafb; border-radius: 24px; padding: 28px 24px 26px">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+            <div style="display: flex; align-items: center; gap: 10px">
+              <span style="font-size: 15px; font-weight: 700; color: {{ accent }}">오늘의 단어</span>
+              <span style="font-size: 14px; font-weight: 500; color: #b0b8c1">{{ wordCount }}</span>
+            </div>
+            <button type="button" onClick="{{ toggleWordFav }}" style="width: 56px; height: 56px; margin: -8px -6px -8px 0; border: none; border-radius: 16px; background: {{ wordFavBg }}; color: {{ wordFavFg }}; font-family: inherit; font-size: 26px; line-height: 1; cursor: pointer" style-active="opacity: 0.7">{{ wordFavIcon }}</button>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <span style="font-size: 46px; font-weight: 900; line-height: 1.1; letter-spacing: -0.035em">{{ word.en }}</span>
+            <span style="font-size: 17px; font-weight: 500; color: #8b95a1">{{ word.ipa }}</span>
+            <span style="font-size: 25px; font-weight: 700; margin-top: 6px">{{ word.ko }}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 16px; padding: 18px">
+            <div style="flex: 1 1 auto; display: flex; flex-direction: column; gap: 8px; min-width: 0">
+              <span style="font-size: 18px; font-weight: 500; line-height: 1.5">{{ word.exEn }}</span>
+              <span style="font-size: 16px; line-height: 1.5; color: #6b7684">{{ word.exKo }}</span>
+            </div>
+            <button type="button" onClick="{{ speakEx }}" style="flex: 0 0 auto; width: 56px; height: 56px; border: none; border-radius: 16px; background: #f2f4f6; color: {{ accent }}; font-family: inherit; font-size: 20px; line-height: 1; cursor: pointer" style-active="background: #e8ebee">▶</button>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <button type="button" onClick="{{ speak }}" style="height: 72px; border: none; border-radius: 18px; background: {{ accent }}; color: #fff; font-family: inherit; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; cursor: pointer" style-active="opacity: 0.82">발음 듣기</button>
+          <div style="display: flex; gap: 12px">
+            <button type="button" onClick="{{ prevWord }}" style="flex: 1; height: 66px; border: none; border-radius: 18px; background: #f2f4f6; color: #4e5968; font-family: inherit; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; cursor: pointer" style-active="background: #e8ebee">이전 단어</button>
+            <button type="button" onClick="{{ nextWord }}" style="flex: 1; height: 66px; border: none; border-radius: 18px; background: #f2f4f6; color: #4e5968; font-family: inherit; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; cursor: pointer" style-active="background: #e8ebee">다음 단어</button>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <span style="font-size: 20px; font-weight: 700">오늘 볼 영상</span>
+          <div onClick="{{ goVideos }}" style="border-radius: 20px; overflow: hidden; background: #f9fafb; cursor: pointer" style-active="background: #f2f4f6">
+            <div style="height: 156px; background-image: repeating-linear-gradient(135deg, #eef1f4 0 10px, #e6eaee 10px 20px); display: flex; align-items: center; justify-content: center">
+              <span style="font-family: ui-monospace, monospace; font-size: 12px; color: #98a2ad; letter-spacing: 0.06em">youtube thumbnail</span>
+            </div>
+            <div style="padding: 18px; display: flex; flex-direction: column; gap: 8px">
+              <span style="font-size: 13px; font-weight: 700; color: {{ accent }}">{{ pick.cat }}</span>
+              <span style="font-size: 20px; font-weight: 700; line-height: 1.35">{{ pick.title }}</span>
+              <span style="font-size: 15px; color: #8b95a1">{{ pick.meta }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isVideos }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{ cats }}" as="c" hint-placeholder-count="4">
+            <button type="button" onClick="{{ c.pick }}" style="height: 54px; padding: 0 20px; border: none; border-radius: 999px; font-family: inherit; font-size: 17px; font-weight: 700; letter-spacing: -0.02em; cursor: pointer; background: {{ c.bg }}; color: {{ c.fg }}">{{ c.name }}</button>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <sc-for list="{{ shownVideos }}" as="v" hint-placeholder-count="4">
+            <div style="display: flex; gap: 14px; align-items: center; background: #f9fafb; border-radius: 18px; padding: 14px">
+              <div style="flex: 0 0 104px; height: 76px; border-radius: 12px; background-image: repeating-linear-gradient(135deg, #eef1f4 0 8px, #e6eaee 8px 16px); cursor: pointer"></div>
+              <div style="flex: 1 1 auto; display: flex; flex-direction: column; gap: 6px; min-width: 0; cursor: pointer">
+                <span style="font-size: 13px; font-weight: 700; color: {{ accent }}">{{ v.cat }}</span>
+                <span style="font-size: 18px; font-weight: 700; line-height: 1.35; text-wrap: pretty">{{ v.title }}</span>
+                <span style="font-size: 14px; color: #8b95a1">{{ v.meta }}</span>
+              </div>
+              <button type="button" onClick="{{ v.toggle }}" style="flex: 0 0 auto; width: 56px; height: 56px; border: none; border-radius: 16px; background: {{ v.favBg }}; color: {{ v.favFg }}; font-family: inherit; font-size: 24px; line-height: 1; cursor: pointer" style-active="opacity: 0.7">{{ v.favIcon }}</button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isSaved }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; gap: 6px; background: #f2f4f6; border-radius: 16px; padding: 6px">
+          <sc-for list="{{ savedTabs }}" as="s" hint-placeholder-count="2">
+            <button type="button" onClick="{{ s.pick }}" style="flex: 1; height: 56px; border: none; border-radius: 12px; font-family: inherit; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; cursor: pointer; background: {{ s.bg }}; color: {{ s.fg }}">{{ s.name }}</button>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ savedShowWords }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <sc-for list="{{ favWords }}" as="w" hint-placeholder-count="4">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #f9fafb; border-radius: 18px; padding: 18px 18px 18px 20px">
+                <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+                  <span style="font-size: 24px; font-weight: 900; letter-spacing: -0.03em">{{ w.en }}</span>
+                  <span style="font-size: 17px; color: #6b7684">{{ w.ko }}</span>
+                </div>
+                <div style="flex: 0 0 auto; display: flex; gap: 8px">
+                  <button type="button" onClick="{{ w.speak }}" style="flex: 0 0 auto; height: 56px; padding: 0 16px; border: none; border-radius: 16px; background: #fff; color: {{ accent }}; font-family: inherit; font-size: 16px; font-weight: 700; white-space: nowrap; cursor: pointer" style-active="background: #eef1f4">듣기</button>
+                  <button type="button" onClick="{{ w.toggle }}" style="width: 56px; height: 56px; border: none; border-radius: 16px; background: #fff; color: {{ accent }}; font-family: inherit; font-size: 22px; line-height: 1; cursor: pointer" style-active="background: #eef1f4">★</button>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noFavWords }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; background: #f9fafb; border-radius: 20px; padding: 48px 24px">
+                <span style="font-size: 19px; font-weight: 700; color: #6b7684">즐겨찾기한 단어가 없어요</span>
+                <span style="font-size: 16px; color: #8b95a1; text-align: center; line-height: 1.5">오늘의 단어에서 ‘즐겨찾기’를 누르면<br>여기에 모여요.</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ savedShowVideos }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <sc-for list="{{ favVideos }}" as="v" hint-placeholder-count="3">
+              <div style="display: flex; gap: 14px; align-items: center; background: #f9fafb; border-radius: 18px; padding: 14px">
+                <div style="flex: 0 0 104px; height: 76px; border-radius: 12px; background-image: repeating-linear-gradient(135deg, #eef1f4 0 8px, #e6eaee 8px 16px); cursor: pointer"></div>
+                <div style="flex: 1 1 auto; display: flex; flex-direction: column; gap: 6px; min-width: 0; cursor: pointer">
+                  <span style="font-size: 13px; font-weight: 700; color: {{ accent }}">{{ v.cat }}</span>
+                  <span style="font-size: 18px; font-weight: 700; line-height: 1.35; text-wrap: pretty">{{ v.title }}</span>
+                  <span style="font-size: 14px; color: #8b95a1">{{ v.meta }}</span>
+                </div>
+                <button type="button" onClick="{{ v.toggle }}" style="flex: 0 0 auto; width: 56px; height: 56px; border: none; border-radius: 16px; background: #fff; color: {{ accent }}; font-family: inherit; font-size: 22px; line-height: 1; cursor: pointer" style-active="background: #eef1f4">★</button>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noFavVideos }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; background: #f9fafb; border-radius: 20px; padding: 48px 24px">
+                <span style="font-size: 19px; font-weight: 700; color: #6b7684">즐겨찾기한 영상이 없어요</span>
+                <span style="font-size: 16px; color: #8b95a1; text-align: center; line-height: 1.5">영상 목록에서 ★ 를 누르면<br>여기에 모여요.</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isMy }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; flex-direction: column; gap: 6px; background: {{ accent }}; border-radius: 24px; padding: 26px 24px">
+          <span style="font-size: 16px; font-weight: 500; color: rgba(255,255,255,0.82)">연속 학습</span>
+          <span style="font-size: 42px; font-weight: 900; color: #fff; letter-spacing: -0.035em">{{ streak }}일째</span>
+          <span style="font-size: 16px; color: rgba(255,255,255,0.82); line-height: 1.5">오늘도 단어를 확인했어요. 잘하고 계세요!</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+          <div style="display: flex; flex-direction: column; gap: 6px; background: #f9fafb; border-radius: 18px; padding: 20px">
+            <span style="font-size: 15px; color: #8b95a1; font-weight: 500">즐겨찾기 단어</span>
+            <span style="font-size: 26px; font-weight: 900; letter-spacing: -0.03em">{{ favWordCount }}</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; background: #f9fafb; border-radius: 18px; padding: 20px">
+            <span style="font-size: 15px; color: #8b95a1; font-weight: 500">즐겨찾기 영상</span>
+            <span style="font-size: 26px; font-weight: 900; letter-spacing: -0.03em">{{ favVideoCount }}</span>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px; background: #f9fafb; border-radius: 24px; padding: 22px 20px">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+            <button type="button" onClick="{{ prevMonth }}" style="flex: 0 0 auto; width: 52px; height: 52px; border: none; border-radius: 16px; background: #fff; color: {{ prevMonthFg }}; font-family: inherit; font-size: 20px; font-weight: 700; cursor: pointer" style-active="background: #eef1f4">‹</button>
+            <div style="flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; gap: 2px">
+              <span style="font-size: 19px; font-weight: 700; white-space: nowrap">{{ monthLabel }}</span>
+              <span style="font-size: 14px; font-weight: 500; color: #8b95a1; white-space: nowrap">{{ monthSummary }}</span>
+            </div>
+            <button type="button" onClick="{{ nextMonth }}" style="flex: 0 0 auto; width: 52px; height: 52px; border: none; border-radius: 16px; background: #fff; color: {{ nextMonthFg }}; font-family: inherit; font-size: 20px; font-weight: 700; cursor: pointer" style-active="background: #eef1f4">›</button>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px">
+            <sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7">
+              <span style="text-align: center; font-size: 13px; font-weight: 700; color: #b0b8c1; padding-bottom: 4px">{{ d }}</span>
+            </sc-for>
+            <sc-for list="{{ calendar }}" as="c" hint-placeholder-count="35">
+              <button type="button" onClick="{{ c.open }}" style="height: 44px; border: none; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-family: inherit; font-size: 15px; cursor: pointer; background: {{ c.bg }}; color: {{ c.fg }}; font-weight: {{ c.weight }}" style-active="opacity: 0.7">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <span style="font-size: 14px; color: #b0b8c1">날짜를 누르면 그날 배운 단어를 볼 수 있어요.</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <button type="button" onClick="{{ goSaved }}" style="height: 68px; border: none; border-radius: 18px; background: #f2f4f6; color: #191f28; font-family: inherit; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; text-align: left; padding: 0 20px; cursor: pointer" style-active="background: #e8ebee">즐겨찾기 모아보기</button>
+          <button type="button" onClick="{{ soon }}" style="height: 68px; border: none; border-radius: 18px; background: #f2f4f6; color: #191f28; font-family: inherit; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; text-align: left; padding: 0 20px; cursor: pointer" style-active="background: #e8ebee">알림 시간 설정</button>
+          <button type="button" onClick="{{ soon }}" style="height: 68px; border: none; border-radius: 18px; background: #f2f4f6; color: #191f28; font-family: inherit; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; text-align: left; padding: 0 20px; cursor: pointer" style-active="background: #e8ebee">글자 크게 보기</button>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+
+  <div style="flex: 0 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 8px 10px 18px; background: #fff; box-shadow: 0 -1px 0 #f2f4f6">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+      <button type="button" onClick="{{ t.pick }}" style="height: 60px; border: none; border-radius: 16px; font-family: inherit; font-size: 17px; font-weight: 700; letter-spacing: -0.03em; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }}">{{ t.name }}</button>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; z-index: 18; background: rgba(25,31,40,0.42); display: flex; flex-direction: column; justify-content: flex-end">
+      <div onClick="{{ closeSheet }}" style="flex: 1 1 auto"></div>
+      <div style="flex: 0 0 auto; background: #fff; border-radius: 26px 26px 0 0; padding: 22px 20px 24px; display: flex; flex-direction: column; gap: 18px; animation: riseIn 0.24s ease-out">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span style="font-size: 21px; font-weight: 700">{{ sheetDate }}</span>
+            <span style="font-size: 14px; font-weight: 700; color: {{ accent }}; background: #f2f4f6; padding: 6px 10px; border-radius: 999px">{{ sheetCount }}</span>
+          </div>
+          <button type="button" onClick="{{ closeSheet }}" style="width: 48px; height: 48px; border: none; border-radius: 14px; background: #f2f4f6; color: #4e5968; font-family: inherit; font-size: 20px; font-weight: 700; cursor: pointer" style-active="background: #e8ebee">✕</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 16px; background: #f9fafb; border-radius: 20px; padding: 22px 20px">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+              <span style="font-size: 34px; font-weight: 900; letter-spacing: -0.035em; line-height: 1.15">{{ sheetWord.en }}</span>
+              <span style="font-size: 16px; font-weight: 500; color: #8b95a1">{{ sheetWord.ipa }}</span>
+              <span style="font-size: 21px; font-weight: 700; margin-top: 4px">{{ sheetWord.ko }}</span>
+            </div>
+            <button type="button" onClick="{{ toggleSheetFav }}" style="flex: 0 0 auto; width: 56px; height: 56px; border: none; border-radius: 16px; background: {{ sheetFavBg }}; color: {{ sheetFavFg }}; font-family: inherit; font-size: 26px; line-height: 1; cursor: pointer" style-active="opacity: 0.7">{{ sheetFavIcon }}</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 14px; padding: 16px">
+            <div style="flex: 1 1 auto; display: flex; flex-direction: column; gap: 8px; min-width: 0">
+              <span style="font-size: 17px; font-weight: 500; line-height: 1.5">{{ sheetWord.exEn }}</span>
+              <span style="font-size: 15px; line-height: 1.5; color: #6b7684">{{ sheetWord.exKo }}</span>
+            </div>
+            <button type="button" onClick="{{ speakSheetEx }}" style="flex: 0 0 auto; width: 56px; height: 56px; border: none; border-radius: 16px; background: #f2f4f6; color: {{ accent }}; font-family: inherit; font-size: 20px; line-height: 1; cursor: pointer" style-active="background: #e8ebee">▶</button>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 6px">
+          <sc-for list="{{ sheetDots }}" as="d" hint-placeholder-count="3">
+            <button type="button" onClick="{{ d.pick }}" style="height: 8px; border: none; border-radius: 999px; padding: 0; cursor: pointer; width: {{ d.w }}; background: {{ d.bg }}"></button>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; gap: 10px">
+            <button type="button" onClick="{{ sheetPrev }}" style="flex: 1; height: 66px; border: none; border-radius: 18px; background: #f2f4f6; color: #4e5968; font-family: inherit; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; cursor: pointer" style-active="background: #e8ebee">이전 단어</button>
+            <button type="button" onClick="{{ sheetNext }}" style="flex: 1; height: 66px; border: none; border-radius: 18px; background: #f2f4f6; color: #4e5968; font-family: inherit; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; cursor: pointer" style-active="background: #e8ebee">다음 단어</button>
+          </div>
+          <button type="button" onClick="{{ speakSheet }}" style="height: 72px; border: none; border-radius: 18px; background: {{ accent }}; color: #fff; font-family: inherit; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; cursor: pointer" style-active="opacity: 0.82">발음 듣기</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 20px; right: 20px; top: 84px; z-index: 40; background: #191f28; color: #fff; border-radius: 16px; padding: 18px 20px; font-size: 17px; font-weight: 500; text-align: center; animation: riseIn 0.22s ease-out">{{ toastText }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 390, &quot;height&quot;: 844},
+ &quot;accentColor&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#3182f6&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;#3182f6&quot;, &quot;#00b2b2&quot;, &quot;#7048e8&quot;, &quot;#f76707&quot;]},
+ &quot;startScreen&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;스플래시&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;스플래시&quot;, &quot;로그인&quot;, &quot;앱 화면&quot;]},
+ &quot;slowSpeech&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;소리&quot;},
+ &quot;softAccent&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;},
+ &quot;startTab&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;오늘&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;오늘&quot;, &quot;영상&quot;, &quot;즐겨찾기&quot;, &quot;마이&quot;]}}">
+const WORDS = [
+  { en: "grocery", ipa: "[ˈɡroʊ.sər.i]", ko: "식료품", exEn: "I need to buy a few grocery items.", exKo: "식료품 몇 가지를 사야 해요." },
+  { en: "appointment", ipa: "[əˈpɔɪnt.mənt]", ko: "약속, 예약", exEn: "I have an appointment at three.", exKo: "3시에 예약이 있어요." },
+  { en: "receipt", ipa: "[rɪˈsiːt]", ko: "영수증", exEn: "Could I get a receipt, please?", exKo: "영수증 좀 받을 수 있을까요?" },
+  { en: "neighbor", ipa: "[ˈneɪ.bɚ]", ko: "이웃", exEn: "My neighbor helped me this morning.", exKo: "오늘 아침에 이웃이 저를 도와줬어요." },
+  { en: "refreshing", ipa: "[rɪˈfreʃ.ɪŋ]", ko: "상쾌한", exEn: "The morning air feels refreshing.", exKo: "아침 공기가 상쾌해요." },
+  { en: "refund", ipa: "[ˈriː.fʌnd]", ko: "환불", exEn: "Can I get a refund for this?", exKo: "이거 환불받을 수 있을까요?" },
+  { en: "pharmacy", ipa: "[ˈfɑːr.mə.si]", ko: "약국", exEn: "The pharmacy is next to the bank.", exKo: "약국은 은행 옆에 있어요." },
+  { en: "borrow", ipa: "[ˈbɑː.roʊ]", ko: "빌리다", exEn: "May I borrow your pen?", exKo: "펜 좀 빌려도 될까요?" },
+  { en: "crowded", ipa: "[ˈkraʊ.dɪd]", ko: "붐비는", exEn: "The bus was very crowded today.", exKo: "오늘 버스가 아주 붐볐어요." },
+  { en: "leftover", ipa: "[ˈleft.oʊ.vər]", ko: "남은 음식", exEn: "I ate the leftover soup.", exKo: "남은 국을 먹었어요." },
+  { en: "on time", ipa: "[ɑːn taɪm]", ko: "제시간에", exEn: "The train arrived on time.", exKo: "기차가 제시간에 도착했어요." },
+  { en: "chilly", ipa: "[ˈtʃɪl.i]", ko: "쌀쌀한", exEn: "It gets chilly at night.", exKo: "밤에는 쌀쌀해져요." }
+];
+const PER_DAY = 3;
+
+const VIDEOS = [
+  { id: "v1", cat: "일상", title: "아침에 쓰는 인사 표현 10가지", meta: "8분 · Everyday English" },
+  { id: "v2", cat: "여행", title: "공항에서 바로 쓰는 문장", meta: "12분 · Travel Talk" },
+  { id: "v3", cat: "식당", title: "카페에서 주문하기", meta: "6분 · Slow English" },
+  { id: "v4", cat: "쇼핑", title: "마트에서 물건 찾을 때", meta: "9분 · Daily Phrases" },
+  { id: "v5", cat: "일상", title: "날씨 이야기로 대화 시작하기", meta: "7분 · Small Talk" },
+  { id: "v6", cat: "병원", title: "병원에서 증상 말하기", meta: "10분 · Real Life English" }
+];
+
+const CATS = ["전체", "일상", "여행", "식당", "쇼핑", "병원"];
+const TABS = [
+  { id: "home", name: "오늘" },
+  { id: "videos", name: "영상" },
+  { id: "saved", name: "즐겨찾기" },
+  { id: "my", name: "마이" }
+];
+const CUR_Y = 2026, CUR_M = 8, TODAY = 20;
+const START_Y = 2026, START_M = 5;
+const ATTENDED_AUG = [2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+
+function attendedFor(y, m) {
+  if (y === CUR_Y && m === CUR_M) return ATTENDED_AUG;
+  if (y > CUR_Y || (y === CUR_Y && m > CUR_M)) return [];
+  if (y < START_Y || (y === START_Y && m < START_M)) return [];
+  const days = new Date(y, m, 0).getDate();
+  const out = [];
+  for (let d = 1; d <= days; d++) {
+    if ((d * 7 + m * 3) % 5 !== 0) out.push(d);
+  }
+  return out;
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const map = { "영상": "videos", "즐겨찾기": "saved", "마이": "my" };
+    this.state = {
+      stage: props.startScreen === "로그인" ? "login" : props.startScreen === "앱 화면" ? "app" : "splash",
+      loginId: "",
+      loginPw: "",
+      tab: map[props.startTab] || "home",
+      wordIndex: 0,
+      cat: "전체",
+      savedView: "words",
+      favWords: ["receipt", "appointment"],
+      favVideos: ["v2"],
+      calYear: CUR_Y,
+      calMonth: CUR_M,
+      openDay: null,
+      sheetIndex: 0,
+      toast: ""
+    };
+  }
+
+  componentDidMount() {
+    if (this.state.stage === "splash") {
+      this._s = setTimeout(() => this.setState(s => (s.stage === "splash" ? { stage: "login" } : null)), 1600);
+    }
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this._s);
+    clearTimeout(this._t);
+  }
+
+  say(text, label) {
+    const synth = window.speechSynthesis;
+    if (!synth) return this.flash("이 기기는 소리 재생을 지원하지 않아요");
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = this.props.slowSpeech === false ? 1 : 0.8;
+    synth.speak(u);
+    this.flash("🔊 " + (label || text));
+  }
+
+  flash(text) {
+    this.setState({ toast: text });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: "" }), 1800);
+  }
+
+  toggle(key, id, onLabel, offLabel) {
+    this.setState(s => {
+      const has = s[key].indexOf(id) >= 0;
+      this.flash(has ? offLabel : onLabel);
+      return { [key]: has ? s[key].filter(x => x !== id) : s[key].concat([id]) };
+    });
+  }
+
+  renderVals() {
+    const accent = this.props.accentColor || "#3182f6";
+    const soft = this.props.softAccent === false ? "#f2f4f6" : "#eaf2ff";
+    const tab = this.state.tab;
+    const i = ((this.state.wordIndex % WORDS.length) + WORDS.length) % WORDS.length;
+    const word = WORDS[i];
+    const wordFav = this.state.favWords.indexOf(word.en) >= 0;
+
+    const chip = (name, active, pick) => ({
+      name, pick,
+      bg: active ? accent : "#f2f4f6",
+      fg: active ? "#fff" : "#6b7684"
+    });
+
+    const cy = this.state.calYear, cm = this.state.calMonth;
+    const attended = attendedFor(cy, cm);
+    const daysInMonth = new Date(cy, cm, 0).getDate();
+    const startDow = new Date(cy, cm - 1, 1).getDay();
+    const isCurMonth = cy === CUR_Y && cm === CUR_M;
+    const atStart = cy === START_Y && cm === START_M;
+
+    const calendar = [];
+    for (let k = 0; k < startDow; k++) calendar.push({ label: "", bg: "transparent", fg: "#fff", weight: "400", open: () => {} });
+    for (let d = 1; d <= daysInMonth; d++) {
+      const on = attended.indexOf(d) >= 0;
+      const isToday = isCurMonth && d === TODAY;
+      const day = d;
+      calendar.push({
+        label: String(d),
+        bg: isToday ? accent : on ? soft : "transparent",
+        fg: isToday ? "#fff" : on ? accent : "#b0b8c1",
+        weight: isToday || on ? "700" : "400",
+        open: on ? () => this.setState({ openDay: day, sheetIndex: 0 }) : () => this.flash("이 날은 학습 기록이 없어요")
+      });
+    }
+
+    const videoRow = v => {
+      const fav = this.state.favVideos.indexOf(v.id) >= 0;
+      return {
+        cat: v.cat, title: v.title, meta: v.meta,
+        favIcon: fav ? "★" : "☆",
+        favBg: fav ? soft : "#fff",
+        favFg: fav ? accent : "#b0b8c1",
+        toggle: () => this.toggle("favVideos", v.id, "즐겨찾기에 담았어요", "즐겨찾기에서 뺐어요")
+      };
+    };
+
+    const sheetDay = this.state.openDay;
+    const dayWords = [];
+    for (let k = 0; k < PER_DAY; k++) {
+      dayWords.push(WORDS[(((sheetDay || 1) * PER_DAY) + k) % WORDS.length]);
+    }
+    const si = Math.min(this.state.sheetIndex, dayWords.length - 1);
+    const sheetWord = dayWords[si];
+    const sheetFav = this.state.favWords.indexOf(sheetWord.en) >= 0;
+
+    const titles = { home: "오늘의 영어", videos: "영상 모음", saved: "즐겨찾기", my: "마이페이지" };
+    const favWordList = WORDS.filter(w => this.state.favWords.indexOf(w.en) >= 0);
+    const favVideoList = VIDEOS.filter(v => this.state.favVideos.indexOf(v.id) >= 0);
+
+    return {
+      isSplash: this.state.stage === "splash",
+      isLogin: this.state.stage === "login",
+      loginId: this.state.loginId,
+      loginPw: this.state.loginPw,
+      setLoginId: e => this.setState({ loginId: e.target.value }),
+      setLoginPw: e => this.setState({ loginPw: e.target.value }),
+      toLogin: () => { clearTimeout(this._s); this.setState({ stage: "login" }); },
+      login: () => this.setState({ stage: "app", tab: "home" }),
+      sheetOpen: sheetDay !== null,
+      sheetDate: sheetDay === null ? "" : cm + "월 " + sheetDay + "일" + (isCurMonth && sheetDay === TODAY ? " (오늘)" : ""),
+      sheetWord,
+      sheetCount: (si + 1) + " / " + dayWords.length,
+      sheetPrev: () => this.setState({ sheetIndex: (si - 1 + dayWords.length) % dayWords.length }),
+      sheetNext: () => this.setState({ sheetIndex: (si + 1) % dayWords.length }),
+      sheetDots: dayWords.map((w, k) => ({
+        pick: () => this.setState({ sheetIndex: k }),
+        bg: k === si ? accent : "#e1e5ea",
+        w: k === si ? "22px" : "8px"
+      })),
+      sheetFavIcon: sheetFav ? "★" : "☆",
+      sheetFavBg: sheetFav ? "#fff" : "transparent",
+      sheetFavFg: sheetFav ? accent : "#c3cad2",
+      toggleSheetFav: () => this.toggle("favWords", sheetWord.en, "즐겨찾기에 담았어요", "즐겨찾기에서 뺐어요"),
+      speakSheet: () => this.say(sheetWord.en, sheetWord.en + " 발음 재생 중"),
+      speakSheetEx: () => this.say(sheetWord.exEn, "예문 재생 중"),
+      closeSheet: () => this.setState({ openDay: null }),
+      today: CUR_M + "월 " + TODAY + "일 " + ["일", "월", "화", "수", "목", "금", "토"][new Date(CUR_Y, CUR_M - 1, TODAY).getDay()] + "요일",
+      screenTitle: titles[tab],
+      isHome: tab === "home",
+      isVideos: tab === "videos",
+      isSaved: tab === "saved",
+      isMy: tab === "my",
+      accent,
+      word,
+      wordCount: (i + 1) + " / " + WORDS.length,
+      wordFavIcon: wordFav ? "★" : "☆",
+      wordFavBgTile: wordFav ? soft : "#fff",
+      wordFavBg: wordFav ? "#fff" : "transparent",
+      wordFavFg: wordFav ? accent : "#c3cad2",
+      toggleWordFav: () => this.toggle("favWords", word.en, "즐겨찾기에 담았어요", "즐겨찾기에서 뺐어요"),
+      pick: VIDEOS[0],
+      toast: !!this.state.toast,
+      toastText: this.state.toast,
+      streak: 12,
+      favWordCount: favWordList.length + "개",
+      favVideoCount: favVideoList.length + "개",
+      monthLabel: cy + "년 " + cm + "월",
+      monthSummary: attended.length + "일 출석",
+      prevMonth: () => this.setState(s => (atStart ? null : (s.calMonth === 1 ? { calYear: s.calYear - 1, calMonth: 12 } : { calMonth: s.calMonth - 1 }))),
+      nextMonth: () => this.setState(s => (isCurMonth ? null : (s.calMonth === 12 ? { calYear: s.calYear + 1, calMonth: 1 } : { calMonth: s.calMonth + 1 }))),
+      prevMonthFg: atStart ? "#dbe0e5" : "#4e5968",
+      nextMonthFg: isCurMonth ? "#dbe0e5" : "#4e5968",
+      weekDays: ["일", "월", "화", "수", "목", "금", "토"],
+      calendar,
+      nextWord: () => this.setState(s => ({ wordIndex: s.wordIndex + 1 })),
+      prevWord: () => this.setState(s => ({ wordIndex: s.wordIndex - 1 })),
+      speak: () => this.say(word.en, word.en + " 발음 재생 중"),
+      speakEx: () => this.say(word.exEn, "예문 재생 중"),
+      soon: () => this.flash("준비 중인 기능이에요"),
+      goVideos: () => this.setState({ tab: "videos" }),
+      goSaved: () => this.setState({ tab: "saved" }),
+      tabs: TABS.map(t => ({
+        name: t.name,
+        pick: () => this.setState({ tab: t.id }),
+        bg: tab === t.id ? soft : "#fff",
+        fg: tab === t.id ? accent : "#b0b8c1"
+      })),
+      savedTabs: [{ id: "words", name: "단어" }, { id: "videos", name: "영상" }].map(s => ({
+        name: s.name,
+        pick: () => this.setState({ savedView: s.id }),
+        bg: this.state.savedView === s.id ? "#fff" : "transparent",
+        fg: this.state.savedView === s.id ? "#191f28" : "#8b95a1"
+      })),
+      savedShowWords: this.state.savedView === "words",
+      savedShowVideos: this.state.savedView === "videos",
+      favWords: favWordList.map(w => ({
+        en: w.en, ko: w.ko,
+        speak: () => this.say(w.en, w.en + " 발음 재생 중"),
+        toggle: () => this.toggle("favWords", w.en, "즐겨찾기에 담았어요", "즐겨찾기에서 뺐어요")
+      })),
+      favVideos: favVideoList.map(videoRow),
+      noFavWords: favWordList.length === 0,
+      noFavVideos: favVideoList.length === 0,
+      cats: CATS.map(c => chip(c, this.state.cat === c, () => this.setState({ cat: c }))),
+      shownVideos: (this.state.cat === "전체" ? VIDEOS : VIDEOS.filter(v => v.cat === this.state.cat)).map(videoRow)
+    };
+  }
+}
+</script>
+</body>
+</html>
