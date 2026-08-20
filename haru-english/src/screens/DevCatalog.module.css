@@ -1,0 +1,78 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-28);
+  padding-bottom: var(--sp-32);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+}
+
+.heading {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.note {
+  font-size: 14px;
+  color: var(--text-4);
+  line-height: 1.5;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+}
+
+.pair {
+  display: flex;
+  gap: var(--sp-12);
+}
+
+.icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-10);
+  align-items: center;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-list);
+}
+
+.tileLabel {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-4);
+}
+
+.tileValue {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.tile {
+  padding: var(--sp-20);
+  gap: var(--sp-6);
+}
+
+.sheetBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-16);
+  padding: var(--sp-22) var(--sp-20);
+}
+
+.sheetWord {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}

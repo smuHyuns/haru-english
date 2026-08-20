@@ -1,0 +1,82 @@
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-8);
+  width: 100%;
+  border-radius: var(--r-btn);
+  font-weight: 700;
+  letter-spacing: var(--ls-base);
+  white-space: nowrap;
+  transition: background-color 0.08s linear;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ── 높이 ──────────────────────────────────
+ * 프로토타입에 나오는 실제 값만 둔다. 임의 높이를 만들지 않는 게
+ * 터치 타깃 52px 규칙(성인·어르신 전제)을 지키는 가장 확실한 방법이다.
+ */
+.h76 {
+  height: 76px;
+  font-size: 23px;
+} /* 로그인 CTA */
+.h72 {
+  height: 72px;
+  font-size: 22px;
+} /* 발음 듣기 */
+.h68 {
+  height: 68px;
+  font-size: 19px;
+} /* 둘러보기 · 설정 리스트 */
+.h66 {
+  height: 66px;
+  font-size: 19px;
+} /* 이전 / 다음 단어 */
+.h56 {
+  height: 56px;
+  font-size: 18px;
+} /* 세그먼트 */
+.h54 {
+  height: 54px;
+  font-size: 17px;
+} /* 카테고리 칩 */
+
+/* ── 변형 ────────────────────────────────── */
+.primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.primary:active {
+  opacity: 0.82;
+}
+
+.secondary {
+  background: var(--fill);
+  color: var(--text-2);
+}
+.secondary:active {
+  background: var(--fill-pressed);
+}
+
+.white {
+  background: var(--surface);
+  color: var(--accent);
+}
+.white:active {
+  background: var(--fill-pressed-alt);
+}
+
+/* 마이페이지 설정 리스트: 왼쪽 정렬 + 좌우 패딩 */
+.list {
+  background: var(--fill);
+  color: var(--text-1);
+  justify-content: flex-start;
+  padding: 0 var(--sp-20);
+}
+.list:active {
+  background: var(--fill-pressed);
+}

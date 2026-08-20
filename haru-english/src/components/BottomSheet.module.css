@@ -1,0 +1,92 @@
+.overlay {
+  /* Toast 와 같은 이유로 fixed — 스크롤 컨테이너 안에서 열려도 화면 전체를 덮는다 */
+  position: fixed;
+  inset: 0;
+  z-index: 18;
+  background: var(--scrim);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* 위쪽 여백 — 누르면 닫힌다 */
+.scrim {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.panel {
+  flex: 0 0 auto;
+  background: var(--surface);
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  padding: var(--sp-22) var(--pad-screen) var(--sp-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-18);
+  animation: riseIn var(--dur-sheet) var(--ease);
+  /* 내용이 길어지면 패널 안에서 스크롤 */
+  max-height: 88%;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-12);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-10);
+}
+
+.date {
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.counter {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--fill);
+  padding: 6px var(--sp-10);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+
+/* ── 점 인디케이터 ─────────────────────── */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-6);
+}
+
+.dot {
+  position: relative;
+  height: 8px;
+  width: 8px;
+  border-radius: var(--r-pill);
+  padding: 0;
+  background: var(--dot-inactive);
+  transition:
+    width 0.16s var(--ease),
+    background-color 0.16s var(--ease);
+}
+
+/*
+ * 점은 보이기엔 8px 이지만 그대로면 터치 타깃 52px 규칙을 크게 어긴다.
+ * 투명 ::before 로 히트 영역만 52px 로 넓힌다 — 겉모습은 프로토타입 그대로.
+ */
+.dot::before {
+  content: '';
+  position: absolute;
+  inset: -22px -8px;
+}
+
+.dotActive {
+  width: 22px;
+  background: var(--accent);
+}

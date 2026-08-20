@@ -1,0 +1,34 @@
+/* 영상 탭 카테고리 칩 — height 54, padding 0 20, radius 999, 17/700 */
+.chip {
+  height: 54px;
+  padding: 0 var(--sp-20);
+  border-radius: var(--r-pill);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: var(--ls-base);
+  white-space: nowrap;
+  background: var(--fill);
+  color: var(--text-3);
+  transition: background-color 0.08s linear;
+}
+
+.chip:active {
+  background: var(--fill-pressed);
+}
+
+.selected,
+.selected:active {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.selected:active {
+  opacity: 0.82;
+}
+
+/* 칩 행 — wrap, gap 8 */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-8);
+}

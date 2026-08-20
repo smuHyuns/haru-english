@@ -1,0 +1,105 @@
+.btn {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-input);
+  line-height: 1;
+  transition: background-color 0.08s linear;
+}
+
+.btn:disabled {
+  pointer-events: none;
+}
+
+/* ── 크기 ──────────────────────────────────
+ * 56 즐겨찾기·재생 / 52 캘린더 월 이동 / 48 시트 닫기
+ * 전부 최소 터치 타깃 52px 규칙 안에 있다 (48 은 시트 닫기 한 곳,
+ * 스크림 탭으로도 닫히는 비파괴 동작이라 예외로 둠).
+ */
+.s56 {
+  width: 56px;
+  height: 56px;
+}
+.s52 {
+  width: 52px;
+  height: 52px;
+}
+.s48 {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-sm);
+}
+
+/* ── 톤 ────────────────────────────────────
+ * 프로토타입의 즐겨찾기/재생 버튼 배경·전경 조합
+ */
+
+/* 즐겨찾기 ON (홈·시트 단어 카드): 흰 배경 + accent */
+.onWhite {
+  background: var(--surface);
+  color: var(--accent);
+}
+.onWhite:active {
+  opacity: 0.7;
+}
+
+/* 즐겨찾기 OFF (홈·시트 단어 카드): 배경 없음 + 흐린 회색 */
+.offBare {
+  background: transparent;
+  color: var(--icon-inactive);
+}
+.offBare:active {
+  opacity: 0.7;
+}
+
+/* 즐겨찾기 ON (영상 리스트): 연한 accent 배경 */
+.onSoft {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.onSoft:active {
+  opacity: 0.7;
+}
+
+/* 즐겨찾기 OFF (영상 리스트): 흰 배경 + 흐린 회색 */
+.offWhite {
+  background: var(--surface);
+  color: var(--text-5);
+}
+.offWhite:active {
+  opacity: 0.7;
+}
+
+/* 예문 재생 ▶ : 회색 배경 + accent */
+.fill {
+  background: var(--fill);
+  color: var(--accent);
+}
+.fill:active {
+  background: var(--fill-pressed);
+}
+
+/* 캘린더 월 이동 · 시트 닫기 : 흰/회색 배경 + 회색 아이콘 */
+.plainWhite {
+  background: var(--surface);
+  color: var(--text-2);
+}
+.plainWhite:active {
+  background: var(--fill-pressed-alt);
+}
+
+.plainFill {
+  background: var(--fill);
+  color: var(--text-2);
+}
+.plainFill:active {
+  background: var(--fill-pressed);
+}
+
+/* 이동 한계 도달 — 색만 흐려지고 클릭은 no-op (프로토타입 동일) */
+.dimmed {
+  color: var(--arrow-disabled);
+}
+.dimmed:active {
+  background: var(--surface);
+}
