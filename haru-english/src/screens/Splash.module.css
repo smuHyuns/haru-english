@@ -1,0 +1,54 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: var(--accent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-22);
+  cursor: pointer;
+  /* 화면 아무 데나 눌러도 넘어간다 */
+  border: none;
+  width: 100%;
+  font-family: var(--font);
+}
+
+.logoTile {
+  width: 104px;
+  height: 104px;
+  border-radius: var(--r-splash-logo);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  animation: logoIn var(--dur-logo) var(--ease);
+}
+
+.logoText {
+  font-size: 46px;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.textBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-8);
+}
+
+.wordmark {
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--on-accent);
+  letter-spacing: -0.04em;
+}
+
+.tagline {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--on-accent-faint);
+}

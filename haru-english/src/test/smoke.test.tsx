@@ -1,21 +1,57 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import App from '@/App';
 import ToastProvider from '@/components/ToastProvider';
 import DevCatalog from '@/screens/DevCatalog';
+import { useSession } from '@/store/session';
 
-// 테스트 하네스(vitest + jsdom + testing-library + @ alias)와 셸 라우팅 스모크 테스트
-describe('앱 셸', () => {
-  it('기본 경로에서 오늘 탭으로 이동하고 헤더를 그린다', () => {
+/** 라우터가 읽는 주소를 바꾼다 (App 이 BrowserRouter 를 직접 만들기 때문) */
+function goTo(path: string) {
+  window.history.pushState({}, '', path);
+}
+
+beforeEach(() => {
+  useSession.setState({ mode: null, username: null });
+  localStorage.clear();
+  goTo('/');
+});
+
+describe('진입 흐름', () => {
+  it('세션이 없으면 스플래시를 보여준다', () => {
     render(<App />);
-    expect(screen.getByRole('heading', { name: '오늘의 영어' })).toBeInTheDocument();
+    expect(screen.getByText('하루영어')).toBeInTheDocument();
+    expect(screen.getByText('매일 한 단어, 매일 한 영상')).toBeInTheDocument();
   });
 
-  it('하단 4탭을 모두 그린다', () => {
+  it('세션 없이 앱 라우트로 가면 로그인으로 보낸다', async () => {
+    goTo('/today');
+    render(<App />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: /오신 것을 환영해요/ })).toBeInTheDocument(),
+    );
+  });
+
+  it('게스트 세션이 있으면 앱 셸이 열린다', async () => {
+    useSession.setState({ mode: 'guest', username: null });
+    goTo('/today');
+    render(<App />);
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: '오늘의 영어' })).toBeInTheDocument(),
+    );
+  });
+});
+
+describe('앱 셸', () => {
+  beforeEach(() => {
+    useSession.setState({ mode: 'guest', username: null });
+    goTo('/today');
+  });
+
+  it('하단 4탭을 모두 그린다', async () => {
     render(<App />);
     for (const name of ['오늘', '영상', '즐겨찾기', '마이']) {
-      expect(screen.getByRole('link', { name })).toBeInTheDocument();
+      await waitFor(() => expect(screen.getByRole('link', { name })).toBeInTheDocument());
     }
   });
 });

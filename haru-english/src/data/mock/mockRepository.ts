@@ -56,13 +56,22 @@ function seedAttendance(year: number, month: number): number[] {
   return days;
 }
 
-function createMockRepository(): Repository {
-  // 메모리 상태 — 모듈 스코프가 아니라 클로저에 둬서 테스트가 격리된다
-  const favorites: Favorites = {
-    words: [...SEED_FAVORITES.words],
-    videos: [...SEED_FAVORITES.videos],
-  };
-  const attendance = new Map<string, number[]>();
+/** 테스트에서 시드 상태로 되돌릴 수 있게 __reset 을 달아 둔다 (앱 코드에는 노출 안 됨) */
+export type MockRepository = Repository & { __reset(): void };
+
+function createMockRepository(): MockRepository {
+  // 메모리 상태 — 모듈 스코프가 아니라 클로저에 둬서 인스턴스끼리 격리된다
+  let favorites: Favorites = { words: [], videos: [] };
+  let attendance = new Map<string, number[]>();
+
+  function reset() {
+    favorites = {
+      words: [...SEED_FAVORITES.words],
+      videos: [...SEED_FAVORITES.videos],
+    };
+    attendance = new Map<string, number[]>();
+  }
+  reset();
 
   const monthKey = (y: number, m: number) => `${y}-${m}`;
 
@@ -83,6 +92,8 @@ function createMockRepository(): Repository {
   }
 
   return {
+    __reset: reset,
+
     async getTodayWords(): Promise<Word[]> {
       return WORDS;
     },

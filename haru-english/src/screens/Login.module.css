@@ -1,0 +1,111 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  background: var(--surface);
+  color: var(--text-1);
+  font-family: var(--font);
+  letter-spacing: var(--ls-base);
+  display: flex;
+  flex-direction: column;
+  padding: 56px var(--pad-login) var(--sp-32);
+  /* 홈 인디케이터 영역 확보 */
+  padding-bottom: calc(var(--sp-32) + env(safe-area-inset-bottom, 0px));
+}
+
+/* ── 상단 ─────────────────────────────── */
+.top {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-16);
+}
+
+.logo {
+  width: 68px;
+  height: 68px;
+  border-radius: var(--r-logo-login);
+  background: var(--accent);
+  display: grid;
+  place-items: center;
+}
+
+.logoText {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  color: var(--on-accent);
+  line-height: 1;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.headline {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.25;
+}
+
+.desc {
+  font-size: 17px;
+  color: var(--text-4);
+  line-height: 1.5;
+}
+
+/* ── 입력 ─────────────────────────────── */
+.fields {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sp-12);
+  padding: var(--sp-32) 0;
+}
+
+.input {
+  height: 68px;
+  border-radius: var(--r-input);
+  background: var(--fill);
+  padding: 0 var(--sp-18);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-1);
+}
+
+.input::placeholder {
+  color: var(--text-4);
+  font-weight: 500;
+}
+
+.input:focus {
+  background: var(--focus-bg);
+  box-shadow: var(--focus-ring);
+}
+
+/* ── 하단 ─────────────────────────────── */
+.actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-10);
+}
+
+.signupLine {
+  text-align: center;
+  font-size: 16px;
+  color: var(--text-4);
+  padding-top: var(--sp-6);
+}
+
+.signupLink {
+  color: var(--accent);
+  font-weight: 500;
+  /* 텍스트 링크라 52px 규칙 대상이 아니지만 누르기 쉽게 여백을 준다 */
+  padding: var(--sp-8);
+  margin: calc(var(--sp-8) * -1);
+}

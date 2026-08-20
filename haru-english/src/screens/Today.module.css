@@ -1,0 +1,173 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-28);
+}
+
+/* ── 오늘의 단어 카드 ─────────────────── */
+.wordCard {
+  gap: var(--sp-20);
+  padding: var(--sp-28) var(--sp-24) var(--sp-26);
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-12);
+}
+
+.cardLabelRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-10);
+}
+
+.cardLabel {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.counter {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-5);
+}
+
+/* 프로토타입: margin -8px -6px -8px 0 — 56px 버튼을 카드 모서리 쪽으로 당긴다 */
+.favButton {
+  margin: -8px -6px -8px 0;
+}
+
+.wordBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-10);
+}
+
+.wordEn {
+  font-size: 46px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  /* 긴 단어가 카드를 밀어내지 않게 */
+  overflow-wrap: break-word;
+}
+
+.wordIpa {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-4);
+}
+
+.wordKo {
+  font-size: 25px;
+  font-weight: 700;
+  margin-top: var(--sp-6);
+}
+
+/* ── 예문 카드 ────────────────────────── */
+.example {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+  padding: var(--sp-18);
+}
+
+.exampleText {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  min-width: 0;
+}
+
+.exampleEn {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.exampleKo {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-3);
+}
+
+/* ── 액션 ─────────────────────────────── */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+}
+
+.pair {
+  display: flex;
+  gap: var(--sp-12);
+}
+
+/* ── 오늘 볼 영상 ─────────────────────── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-14);
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.videoCard {
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--surface-raised);
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  width: 100%;
+  padding: 0;
+}
+
+.videoCard:active {
+  background: var(--fill);
+}
+
+.videoBody {
+  padding: var(--sp-18);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.videoCat {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.videoTitle {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.videoMeta {
+  font-size: 15px;
+  color: var(--text-4);
+}
+
+/* ── 로딩 스켈레톤 ────────────────────── */
+.skeleton {
+  background: var(--surface-raised);
+  border-radius: var(--r-card-lg);
+  height: 280px;
+}
+
+.skeletonRow {
+  background: var(--fill);
+  border-radius: var(--r-btn);
+  height: 72px;
+}
