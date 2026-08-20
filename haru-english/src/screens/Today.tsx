@@ -7,7 +7,8 @@ import { Card, InnerCard, Thumb } from '@/components/Surface';
 import { Play, Star, StarOutline } from '@/components/icons';
 import { videoMeta } from '@/data/types';
 import { useCategoryLabel } from '@/hooks/useCategoryLabel';
-import { useFavorites, useTodayWords, useToggleFavorite, useVideos } from '@/hooks/useData';
+import { useFavorites, useTodayWords, useVideos } from '@/hooks/useData';
+import { useFavoriteToggle } from '@/hooks/useFavoriteToggle';
 import { useSpeak } from '@/hooks/useSpeak';
 
 import styles from './Today.module.css';
@@ -20,7 +21,7 @@ export default function Today() {
   const { data: words } = useTodayWords();
   const { data: videos } = useVideos('all');
   const { data: favorites } = useFavorites();
-  const toggleFavorite = useToggleFavorite();
+  const toggleFavorite = useFavoriteToggle();
 
   // 프로토타입과 동일: 인덱스는 음수도 허용하고 렌더할 때 모듈로로 정규화한다 (무한 순환)
   const [wordIndex, setWordIndex] = useState(0);
@@ -55,7 +56,7 @@ export default function Today() {
             label={isFav ? `${word.en} 즐겨찾기 해제` : `${word.en} 즐겨찾기`}
             tone={isFav ? 'onWhite' : 'offBare'}
             className={styles.favButton}
-            onClick={() => toggleFavorite.mutate({ kind: 'words', id: word.id, on: !isFav })}
+            onClick={() => toggleFavorite('words', word.id, isFav)}
           >
             {isFav ? <Star size={26} /> : <StarOutline size={26} />}
           </IconButton>

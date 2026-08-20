@@ -1,0 +1,65 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-section);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-list);
+}
+
+/* ── 즐겨찾기 단어 항목 ───────────────── */
+.wordRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-12);
+  background: var(--surface-raised);
+  border-radius: var(--r-btn);
+  padding: var(--sp-18) var(--sp-18) var(--sp-18) var(--sp-20);
+}
+
+.wordText {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.wordEn {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  overflow-wrap: break-word;
+}
+
+.wordKo {
+  font-size: 17px;
+  color: var(--text-3);
+}
+
+.wordActions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: var(--sp-8);
+}
+
+/* '듣기' — 높이 56, 좌우 패딩 16, 흰 배경 + accent */
+.listenButton {
+  flex: 0 0 auto;
+  height: 56px;
+  padding: 0 var(--sp-16);
+  border-radius: var(--r-input);
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background-color 0.08s linear;
+}
+
+.listenButton:active {
+  background: var(--fill-pressed-alt);
+}

@@ -5,17 +5,15 @@ import { Navigate, Outlet, Route, BrowserRouter as Router, Routes } from 'react-
 import ToastProvider from '@/components/ToastProvider';
 import DevCatalog from '@/screens/DevCatalog';
 import Login from '@/screens/Login';
+import My from '@/screens/My';
+import Saved from '@/screens/Saved';
 import Splash from '@/screens/Splash';
 import Today from '@/screens/Today';
+import Videos from '@/screens/Videos';
 import AppShell from '@/shell/AppShell';
 import { startTouchAudit } from '@/lib/touchAudit';
 import { queryClient } from '@/query/queryClient';
 import { useSession } from '@/store/session';
-
-// Phase 5 나머지에서 실제 화면으로 교체된다.
-function Placeholder({ name }: { name: string }) {
-  return <p style={{ padding: '40px 0', color: 'var(--text-4)' }}>{name} — 준비 중</p>;
-}
 
 /** 세션이 없으면 로그인으로. 게스트 세션도 유효한 세션으로 친다 */
 function RequireSession() {
@@ -38,9 +36,9 @@ export default function App() {
             <Route element={<RequireSession />}>
               <Route element={<AppShell />}>
                 <Route path="/today" element={<Today />} />
-                <Route path="/videos" element={<Placeholder name="영상" />} />
-                <Route path="/saved" element={<Placeholder name="즐겨찾기" />} />
-                <Route path="/my" element={<Placeholder name="마이페이지" />} />
+                <Route path="/videos" element={<Videos />} />
+                <Route path="/saved" element={<Saved />} />
+                <Route path="/my" element={<My />} />
               </Route>
             </Route>
 

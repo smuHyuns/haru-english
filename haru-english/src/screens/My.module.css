@@ -1,0 +1,154 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-section);
+}
+
+/* ── 스트릭 카드 ──────────────────────── */
+.streak {
+  background: var(--accent);
+  border-radius: var(--r-card-lg);
+  padding: var(--sp-26) var(--sp-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.streakLabel {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--on-accent-soft);
+}
+
+.streakValue {
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--on-accent);
+  letter-spacing: -0.035em;
+}
+
+.streakNote {
+  font-size: 16px;
+  color: var(--on-accent-soft);
+  line-height: 1.5;
+}
+
+/* ── 통계 2열 ─────────────────────────── */
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-list);
+}
+
+.statCard {
+  padding: var(--sp-20);
+  gap: var(--sp-6);
+}
+
+.statLabel {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-4);
+}
+
+.statValue {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+/* ── 출석 캘린더 ──────────────────────── */
+.calendar {
+  gap: var(--sp-16);
+  padding: var(--sp-22) var(--pad-screen);
+}
+
+.calHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-8);
+}
+
+.calHeaderCenter {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.monthLabel {
+  font-size: 19px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.monthSummary {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-4);
+  white-space: nowrap;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--sp-4);
+}
+
+.weekday {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-5);
+  padding-bottom: var(--sp-4);
+}
+
+/*
+ * 날짜 셀은 44px 이라 터치 타깃 52px 규칙의 예외다.
+ * 7열 그리드라 물리적으로 여유가 없고, 잘못 눌러도 토스트만 뜨는 비파괴 동작이라
+ * 허용했다 (mds/01 §3 각주). data-touch-exempt 로 감사에서 제외한다.
+ */
+.cell {
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-xs);
+  font-size: 15px;
+  font-weight: 400;
+  background: transparent;
+  color: var(--text-5);
+}
+
+.cell:active {
+  opacity: 0.7;
+}
+
+.cellAttended {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.cellToday {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.cellEmpty {
+  height: 44px;
+}
+
+.caption {
+  font-size: 14px;
+  color: var(--text-5);
+}
+
+/* ── 설정 리스트 ──────────────────────── */
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-list);
+}

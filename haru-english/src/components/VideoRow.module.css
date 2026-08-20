@@ -1,0 +1,54 @@
+/* 영상 리스트 항목 — 영상 탭과 즐겨찾기 탭이 공유한다 */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-14);
+  background: var(--surface-raised);
+  border-radius: var(--r-btn);
+  padding: var(--sp-14);
+}
+
+/* 썸네일 + 텍스트를 하나의 버튼으로 묶는다.
+   프로토타입은 둘 다 cursor:pointer 였고, 실제로는 영상 재생 진입점이 된다. */
+.main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-14);
+  text-align: left;
+  background: none;
+  padding: 0;
+}
+
+.text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.cat {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.meta {
+  font-size: 14px;
+  color: var(--text-4);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-list);
+}
