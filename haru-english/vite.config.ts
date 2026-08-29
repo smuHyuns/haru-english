@@ -32,5 +32,12 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    /*
+     * 테스트는 항상 mock 어댑터로 고정한다.
+     * Vitest 도 .env.local 을 읽기 때문에, 이걸 안 박아두면 로컬에
+     * VITE_DATA_SOURCE=supabase 를 넣은 사람만 테스트가 깨진다 (실제로 그랬다).
+     * 테스트가 네트워크와 남의 로컬 설정에 의존하면 안 된다.
+     */
+    env: { VITE_DATA_SOURCE: 'mock' },
   },
 });
