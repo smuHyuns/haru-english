@@ -87,6 +87,20 @@
   box-shadow: var(--focus-ring);
 }
 
+/*
+ * 오류 안내. 입력 아래에 붙여 어디가 문제인지 눈이 바로 가게 둔다.
+ * 색만으로 알리지 않도록 배경 블록 + 충분한 크기(16px)로 준다.
+ */
+.error {
+  border-radius: var(--r-input);
+  background: var(--danger-soft);
+  color: var(--danger);
+  padding: var(--sp-14) var(--sp-16);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
 /* ── 하단 ─────────────────────────────── */
 .actions {
   flex: 0 0 auto;

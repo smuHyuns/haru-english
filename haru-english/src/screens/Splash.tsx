@@ -12,15 +12,24 @@ import styles from './Splash.module.css';
  */
 export default function Splash() {
   const navigate = useNavigate();
+  const status = useSession((s) => s.status);
   const mode = useSession((s) => s.mode);
 
+  // 세션 복원 전에 넘어가면 이미 로그인한 사람도 로그인 화면을 보게 된다.
+  // 1.6초 안에 대개 끝나므로 체감상 기다림이 늘지 않는다.
+  const ready = status === 'ready';
+
   useEffect(() => {
+    if (!ready) return;
     const next = mode ? '/today' : '/login';
     const timer = setTimeout(() => navigate(next, { replace: true }), SPLASH_MS);
     return () => clearTimeout(timer);
-  }, [mode, navigate]);
+  }, [ready, mode, navigate]);
 
-  const skip = () => navigate(mode ? '/today' : '/login', { replace: true });
+  const skip = () => {
+    if (!ready) return;
+    navigate(mode ? '/today' : '/login', { replace: true });
+  };
 
   return (
     <button type="button" className={styles.root} onClick={skip} aria-label="시작하기">

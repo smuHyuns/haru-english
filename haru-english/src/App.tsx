@@ -17,13 +17,24 @@ import { useSession } from '@/store/session';
 
 /** 세션이 없으면 로그인으로. 게스트 세션도 유효한 세션으로 친다 */
 function RequireSession() {
+  const status = useSession((s) => s.status);
   const mode = useSession((s) => s.mode);
+
+  /*
+   * 복원 중에는 아무것도 결정하지 않는다.
+   * 여기서 곧장 로그인으로 보내면, 새로고침할 때마다 로그인 화면이 한 번 번쩍이고
+   * 주소창에 친 /my 같은 경로도 잃는다 (Supabase 세션 복원이 비동기라 항상 늦다).
+   */
+  if (status === 'loading') return null;
   return mode ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
 export default function App() {
   // 개발 모드에서만 터치 타깃 52px 위반을 잡아 콘솔에 알린다
   useEffect(() => startTouchAudit(), []);
+
+  // 저장된 세션 복원 + 이후 변화 구독 (토큰 갱신, 다른 탭에서의 로그아웃)
+  useEffect(() => useSession.getState().init(), []);
 
   return (
     <QueryClientProvider client={queryClient}>

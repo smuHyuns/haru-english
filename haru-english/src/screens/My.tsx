@@ -19,6 +19,7 @@ import {
 import { cx } from '@/lib/cx';
 import { useAttendance, useFavorites, useProfile, useStreak } from '@/hooks/useData';
 import { useToast } from '@/hooks/useToast';
+import { useSession } from '@/store/session';
 
 import DayWordsSheet from './DayWordsSheet';
 import styles from './My.module.css';
@@ -27,6 +28,9 @@ export default function My() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const toast = useToast();
+  const mode = useSession((s) => s.mode);
+  const username = useSession((s) => s.username);
+  const signOut = useSession((s) => s.signOut);
 
   const today = parseDate(kstToday());
   const cursor = parseMonthParam(params.get('ym')) ?? { year: today.year, month: today.month };
@@ -161,6 +165,20 @@ export default function My() {
         <Button variant="list" height={68} onClick={() => toast.show('준비 중인 기능이에요')}>
           글자 크게 보기
         </Button>
+
+        {/*
+          게스트는 기기를 바꾸거나 앱을 지우면 기록이 사라진다. 그 사실을 알리고
+          가입으로 잇는다 — 가입해도 지금 계정을 승격시키는 방식이라 기록이 그대로 따라온다.
+        */}
+        {mode === 'guest' ? (
+          <Button variant="list" height={68} onClick={() => navigate('/login?mode=signup')}>
+            회원가입하고 기록 저장하기
+          </Button>
+        ) : (
+          <Button variant="list" height={68} onClick={() => void signOut()}>
+            로그아웃{username ? ` (${username})` : ''}
+          </Button>
+        )}
       </div>
     </div>
   );

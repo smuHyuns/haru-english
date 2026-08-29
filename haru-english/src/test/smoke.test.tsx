@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import App from '@/App';
+import { __setMockSession } from '@/auth/mockAuth';
 import ToastProvider from '@/components/ToastProvider';
 import DevCatalog from '@/screens/DevCatalog';
 import { useSession } from '@/store/session';
@@ -11,11 +12,28 @@ function goTo(path: string) {
   window.history.pushState({}, '', path);
 }
 
+/**
+ * 스토어는 모듈 싱글턴이라 테스트끼리 상태가 샌다.
+ * status 까지 initial 로 되돌리지 않으면 앞 테스트가 남긴 'ready' 때문에
+ * 세션 복원 경로를 전혀 안 타면서 초록불이 뜬다 (실제로 그랬다).
+ */
 beforeEach(() => {
-  useSession.setState({ mode: null, username: null });
   localStorage.clear();
+  useSession.setState({
+    status: 'loading',
+    mode: null,
+    username: null,
+    userId: null,
+    pending: false,
+    error: null,
+  });
   goTo('/');
 });
+
+/** 저장된 게스트 세션을 심는다 — 앱이 부팅하며 이걸 복원해야 한다 */
+function seedGuestSession() {
+  __setMockSession({ userId: 'mock-guest', mode: 'guest', username: null });
+}
 
 describe('진입 흐름', () => {
   it('세션이 없으면 스플래시를 보여준다', () => {
@@ -33,7 +51,7 @@ describe('진입 흐름', () => {
   });
 
   it('게스트 세션이 있으면 앱 셸이 열린다', async () => {
-    useSession.setState({ mode: 'guest', username: null });
+    seedGuestSession();
     goTo('/today');
     render(<App />);
     await waitFor(() =>
@@ -44,7 +62,7 @@ describe('진입 흐름', () => {
 
 describe('앱 셸', () => {
   beforeEach(() => {
-    useSession.setState({ mode: 'guest', username: null });
+    seedGuestSession();
     goTo('/today');
   });
 

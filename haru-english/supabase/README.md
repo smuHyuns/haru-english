@@ -31,13 +31,22 @@ npx supabase db seed        # 또는 seed.sql 을 psql 로
 
 ## 대시보드에서 따로 켜야 하는 것
 
+로그인 식별자는 **합성 이메일** 방식으로 확정됐다.
+입력한 아이디/휴대폰이 `{정규화}@haru-english.app` 으로 바뀌어 email 인증에 실린다
+(`src/auth/identifier.ts`). 사용자는 이 이메일을 보지 못하고, 수신도 불가능하다.
+
 | 위치 | 항목 | 값 | 이유 |
 |---|---|---|---|
 | Authentication > Sign In / Providers | **Anonymous sign-ins** | **ON** | `로그인 없이 둘러보기` = `signInAnonymously()`. 게스트도 uid 가 있어야 RLS 와 데이터 승계가 성립 |
 | Authentication > Sign In / Providers | Email | ON | 아이디/비밀번호 로그인 |
-| Authentication > Sign In / Providers | Confirm email | **OFF** | 합성 이메일이라 수신 불가 (로그인 식별자 방식 확정 전까지) |
+| Authentication > Sign In / Providers | **Confirm email** | **OFF** | `@haru-english.app` 은 실제 메일함이 아니다. 켜두면 확인 메일을 영영 못 받아 **아무도 가입을 마칠 수 없다** |
+| Authentication > Sign In / Providers | Minimum password length | **8** | `MIN_PASSWORD` 와 같아야 한다. 서버가 더 크면 클라이언트를 통과한 값이 서버에서 거절된다 |
 | Authentication > URL Configuration | Site URL | 프로덕션 도메인 | |
 | Authentication > URL Configuration | Redirect URLs | 프로덕션 + `https://*.vercel.app` | Vercel 프리뷰 배포 |
+
+> **비밀번호 재설정 메일은 보낼 수 없다.** 합성 도메인이라 수신이 불가능하다.
+> 비밀번호를 잊은 사용자는 현재 복구 경로가 없다 — 대상 사용자층(어르신)에서 실제로
+> 발생할 문제이므로, 카카오/네이버 OAuth 추가를 후속 과제로 남긴다.
 
 ## 적용 확인
 
