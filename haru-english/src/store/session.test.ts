@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { __setMockSession } from '@/auth/mockAuth';
+import { __setMockSession, mockAuth } from '@/auth/mockAuth';
 import { queryClient } from '@/query/queryClient';
 
 import { useSession } from './session';
@@ -114,5 +114,28 @@ describe('오류 처리', () => {
     await useSession.getState().signIn('홍길동', 'password123');
     useSession.getState().clearError();
     expect(useSession.getState().error).toBeNull();
+  });
+});
+
+describe('구독', () => {
+  it('이미 ready 여도 구독은 건다 (StrictMode 재마운트 대비)', async () => {
+    useSession.setState({ status: 'ready', mode: 'guest', userId: 'mock-guest', username: null });
+
+    const unsubscribe = useSession.getState().init();
+    // 다른 탭에서 로그아웃한 상황을 어댑터 이벤트로 흉내낸다
+    await mockAuth.signOut();
+
+    expect(useSession.getState().mode).toBeNull();
+    unsubscribe();
+  });
+
+  it('해제하면 더 이상 반영하지 않는다', async () => {
+    useSession.setState({ status: 'ready', mode: 'guest', userId: 'mock-guest', username: null });
+
+    const unsubscribe = useSession.getState().init();
+    unsubscribe();
+    await mockAuth.signInAsGuest();
+
+    expect(useSession.getState().userId).toBe('mock-guest');
   });
 });

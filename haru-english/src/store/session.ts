@@ -83,14 +83,19 @@ export const useSession = create<SessionState>()((set, get) => {
     error: null,
 
     init: () => {
-      // 테스트가 상태를 직접 주입한 경우엔 덮어쓰지 않는다
-      if (get().status === 'ready') return () => {};
-
-      void auth
-        .getSession()
-        .then(apply)
-        // 복원 실패는 로그아웃과 같게 다룬다 — 여기서 앱을 막으면 안 된다
-        .catch(() => set({ status: 'ready' }));
+      /*
+       * 복원은 아직 안 끝났을 때만. 테스트가 상태를 직접 주입한 경우를 덮어쓰지 않는다.
+       * 구독은 조건 없이 건다 — StrictMode 는 이펙트를 마운트·언마운트·마운트로 두 번 도는데,
+       * 두 번째 호출이 이미 ready 라는 이유로 통째로 빠지면 개발 중에는 토큰 갱신도
+       * 다른 탭 로그아웃도 반영되지 않는다 (프로덕션과 다르게 동작하게 된다).
+       */
+      if (get().status !== 'ready') {
+        void auth
+          .getSession()
+          .then(apply)
+          // 복원 실패는 로그아웃과 같게 다룬다 — 여기서 앱을 막으면 안 된다
+          .catch(() => set({ status: 'ready' }));
+      }
 
       return auth.subscribe(apply);
     },
