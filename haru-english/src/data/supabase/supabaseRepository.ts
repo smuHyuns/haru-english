@@ -1,4 +1,4 @@
-import { PER_DAY } from '@/lib/constants';
+import { PER_DAY, TODAY_VIDEOS } from '@/lib/constants';
 import { deriveVideosFromDay, wordStartIndex } from '@/lib/curriculum';
 import { addDays, daysInMonth, kstToday, parseDate, toDateStr } from '@/lib/date';
 
@@ -174,14 +174,27 @@ export const supabaseRepository: Repository = {
   },
 
   async getVideos(category: CategoryFilter): Promise<Video[]> {
+    /*
+     * 생활회화는 409편이라 통째로 내려받지 않는다. 오늘 구간 TODAY_VIDEOS 편만.
+     * 화면에서 잘라내는 게 아니라 여기서 막는다 — 그래야 네트워크로 409행이 안 온다.
+     */
+    if (category === 'daily') {
+      return supabaseRepository.getVideosByDate(kstToday(), TODAY_VIDEOS);
+    }
+
     const base = getSupabase().from('videos').select(VIDEO_COLS).eq('is_active', true);
-    const q = category === 'all' ? base : base.eq('category_id', category);
     // id 가 유튜브 영상 ID(무작위 11자)라 정렬 기준이 못 된다. sort_order 로 커리큘럼 순.
-    // 카테고리를 안 고른 '전체' 에서도 생활회화 1강부터 보이도록 category_id 를 먼저 본다.
-    return unwrap(
-      await q.order('category_id').order('sort_order').returns<VideoRow[]>(),
+    const rest = unwrap(
+      await (category === 'all' ? base.neq('category_id', 'daily') : base.eq('category_id', category))
+        .order('category_id')
+        .order('sort_order')
+        .returns<VideoRow[]>(),
       '영상 목록',
     ).map(toVideo);
+
+    if (category !== 'all') return rest;
+    // '전체' 는 생활회화(sort_order 1) 를 앞에 두고 나머지를 잇는다
+    return [...(await supabaseRepository.getVideosByDate(kstToday(), TODAY_VIDEOS)), ...rest];
   },
 
   async getVideosByDate(date: DateStr, count: number): Promise<Video[]> {

@@ -1,3 +1,4 @@
+import { TODAY_VIDEOS } from '@/lib/constants';
 import { deriveVideosFromDay, deriveWordsForDay } from '@/lib/curriculum';
 import { addDays, daysInMonth, kstToday, parseDate } from '@/lib/date';
 
@@ -20,6 +21,8 @@ import { CATEGORIES, JOINED_AT, SEED_FAVORITES, VIDEOS, WORDS } from './content'
  * Supabase 프로젝트 없이 Phase 5(화면 구현)까지 완주하기 위한 것이고,
  * 테스트에서도 계속 쓴다. 쓰기는 메모리에만 반영된다 (새로고침하면 시드로 복귀).
  */
+
+const DAILY = VIDEOS.filter((v) => v.categoryId === 'daily');
 
 /** 커리큘럼 규칙은 supabase 어댑터와 공유한다 (lib/curriculum.ts) */
 function wordsForDay(date: DateStr): Word[] {
@@ -106,17 +109,19 @@ function createMockRepository(): MockRepository {
     },
 
     async getVideos(category: CategoryFilter): Promise<Video[]> {
-      return category === 'all' ? VIDEOS : VIDEOS.filter((v) => v.categoryId === category);
+      // 생활회화는 오늘 구간 TODAY_VIDEOS 편만 (supabase 어댑터와 같은 규칙)
+      const daily = deriveVideosFromDay(kstToday(), DAILY, TODAY_VIDEOS);
+      if (category === 'daily') return daily;
+
+      const rest = VIDEOS.filter((v) => v.categoryId !== 'daily');
+      if (category !== 'all') return rest.filter((v) => v.categoryId === category);
+      return [...daily, ...rest];
     },
 
     async getVideosByDate(date: DateStr, count: number): Promise<Video[]> {
       // 목에는 daily_videos 가 없으므로 항상 폴백 규칙을 쓴다.
       // supabase 어댑터도 커리큘럼이 떨어지면 같은 함수로 떨어진다.
-      return deriveVideosFromDay(
-        date,
-        VIDEOS.filter((v) => v.categoryId === 'daily'),
-        count,
-      );
+      return deriveVideosFromDay(date, DAILY, count);
     },
 
     async getAttendance(year: number, month: number): Promise<AttendanceMonth> {

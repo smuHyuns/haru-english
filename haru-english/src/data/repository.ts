@@ -30,7 +30,13 @@ export interface Repository {
 
   getCategories(): Promise<Category[]>;
 
-  /** GET /videos?category= */
+  /**
+   * GET /videos?category=
+   *
+   * 생활회화(daily)는 커리큘럼이 409편이라 전부 내려주지 않는다.
+   * 오늘부터 TODAY_VIDEOS 편만 — 홈 캐러셀과 같은 구간이다.
+   * 지난 회차는 즐겨찾기(getVideosByIds)로만 다시 볼 수 있다.
+   */
   getVideos(category: CategoryFilter): Promise<Video[]>;
 
   /**
