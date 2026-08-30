@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { Video } from '@/data/types';
 
 import { CURRICULUM_START } from './constants';
-import { deriveVideoForDay } from './curriculum';
+import { deriveVideoForDay, deriveVideosFromDay } from './curriculum';
 import { addDays, daysBetween } from './date';
 
 const v = (id: string): Video => ({
@@ -47,6 +47,41 @@ describe('deriveVideoForDay', () => {
 
   it('목록이 비면 null — 화면은 이 경우 영상 카드를 통째로 숨긴다', () => {
     expect(deriveVideoForDay('2026-05-01', [])).toBeNull();
+  });
+});
+
+describe('deriveVideosFromDay — 홈 캐러셀', () => {
+  it('요청한 개수만큼, 그날부터 이어서', () => {
+    expect(deriveVideosFromDay(CURRICULUM_START, CATALOG, 2).map((v) => v.id)).toEqual(['a', 'b']);
+    expect(deriveVideosFromDay(addDays(CURRICULUM_START, 1), CATALOG, 2).map((v) => v.id)).toEqual([
+      'b',
+      'c',
+    ]);
+  });
+
+  it('첫 편은 그날의 deriveVideoForDay 와 같다', () => {
+    for (let i = 0; i < 12; i++) {
+      const d = addDays(CURRICULUM_START, i);
+      expect(deriveVideosFromDay(d, CATALOG, 5)[0]).toEqual(deriveVideoForDay(d, CATALOG));
+    }
+  });
+
+  it('카탈로그보다 많이 요청해도 같은 편이 겹치지 않는다', () => {
+    const out = deriveVideosFromDay(CURRICULUM_START, CATALOG, 10);
+    expect(out).toHaveLength(CATALOG.length); // 3개뿐
+    expect(new Set(out.map((v) => v.id)).size).toBe(CATALOG.length);
+  });
+
+  it('카탈로그 끝을 넘어가면 앞으로 돌아온다', () => {
+    expect(deriveVideosFromDay(addDays(CURRICULUM_START, 2), CATALOG, 3).map((v) => v.id)).toEqual([
+      'c',
+      'a',
+      'b',
+    ]);
+  });
+
+  it('목록이 비면 빈 배열', () => {
+    expect(deriveVideosFromDay(CURRICULUM_START, [], 5)).toEqual([]);
   });
 });
 

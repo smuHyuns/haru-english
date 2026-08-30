@@ -7,6 +7,9 @@ export const TOAST_MS = 1800;
 /** 하루 학습 단어 수 */
 export const PER_DAY = 3;
 
+/** 홈 '오늘 볼 영상' 캐러셀에 올릴 편 수 (오늘 + 앞으로 며칠치) */
+export const TODAY_VIDEOS = 5;
+
 /**
  * 커리큘럼 시작일. daily_words · daily_videos 시드가 이 날부터 채워진다.
  * 커리큘럼이 떨어진 뒤(어댑터 폴백)에도 이 날을 기준으로 순환시켜

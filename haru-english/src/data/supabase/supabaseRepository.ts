@@ -1,5 +1,5 @@
 import { PER_DAY } from '@/lib/constants';
-import { deriveVideoForDay, wordStartIndex } from '@/lib/curriculum';
+import { deriveVideosFromDay, wordStartIndex } from '@/lib/curriculum';
 import { addDays, daysInMonth, kstToday, parseDate, toDateStr } from '@/lib/date';
 
 import type { Repository } from '../repository';
@@ -184,20 +184,25 @@ export const supabaseRepository: Repository = {
     ).map(toVideo);
   },
 
-  async getVideoByDate(date: DateStr): Promise<Video | null> {
+  async getVideosByDate(date: DateStr, count: number): Promise<Video[]> {
     const rows = unwrap(
       await getSupabase()
         .from('daily_videos')
-        .select(`video_id, videos(${VIDEO_COLS})`)
-        .eq('learn_date', date)
-        .returns<{ video_id: string; videos: VideoRow | null }[]>(),
-      '오늘의 영상',
+        .select(`learn_date, videos(${VIDEO_COLS})`)
+        .gte('learn_date', date)
+        .lte('learn_date', addDays(date, count - 1))
+        .order('learn_date')
+        .returns<{ learn_date: DateStr; videos: VideoRow | null }[]>(),
+      '오늘 볼 영상',
     );
-    const row = rows[0]?.videos;
-    if (row) return toVideo(row);
+    const found = rows.map((r) => r.videos).filter((v): v is VideoRow => v !== null);
+    if (found.length === count) return found.map(toVideo);
 
-    // 폴백 — 커리큘럼이 그 날짜까지 안 채워진 경우. 생활회화를 순환시킨다.
-    return deriveVideoForDay(date, await supabaseRepository.getVideos('daily'));
+    /*
+     * 커리큘럼이 끝나가면 요청한 만큼 안 나온다(마지막 날 근처). 그때는 부분 결과를
+     * 쓰지 않고 통째로 폴백한다 — 3편만 보이다 말면 목록이 잘린 것처럼 보인다.
+     */
+    return deriveVideosFromDay(date, await supabaseRepository.getVideos('daily'), count);
   },
 
   async getAttendance(year: number, month: number): Promise<AttendanceMonth> {

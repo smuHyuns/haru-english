@@ -60,6 +60,44 @@ describe('영상 화면', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('즐겨찾기에 담았어요');
   });
 
+  it('영상 개수를 보여준다', async () => {
+    renderScreen(<Videos />);
+    expect(await screen.findByText('영상 7개')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('radio', { name: '이름순' }));
+    // 정렬을 바꿔도 개수는 그대로
+    expect(screen.getByText('영상 7개')).toBeInTheDocument();
+  });
+
+  it('이름순으로 정렬한다 — 숫자 접두사를 사람이 읽는 순서로', async () => {
+    renderScreen(<Videos />, '/videos?cat=daily');
+    await screen.findByText('1강 쉽고 짧은 영어 듣다보면 외워져요');
+
+    await userEvent.click(screen.getByRole('radio', { name: '이름순' }));
+    await waitFor(() => expect(screen.getByRole('radio', { name: '이름순' })).toBeChecked());
+
+    // '10강' 이 '2강' 앞에 오면 안 된다 (numeric collation)
+    const titles = screen.getAllByRole('listitem').map((li) => li.textContent ?? '');
+    expect(titles[0]).toContain('1강');
+    expect(titles[1]).toContain('2강');
+  });
+
+  it('정렬 기준이 URL 에 남아 새로고침해도 유지된다', async () => {
+    renderScreen(<Videos />, '/videos?cat=daily&sort=name');
+    expect(screen.getByRole('radio', { name: '이름순' })).toBeChecked();
+    // 카테고리 필터도 같이 살아 있어야 한다
+    await waitFor(() => expect(screen.getAllByRole('listitem')).toHaveLength(3));
+  });
+
+  it('카테고리를 바꿔도 정렬 기준이 유지된다', async () => {
+    renderScreen(<Videos />, '/videos?sort=name');
+    await screen.findByText('영상 7개');
+
+    await userEvent.click(screen.getByRole('button', { name: '공부법' }));
+    await waitFor(() => expect(screen.getByText('영상 1개')).toBeInTheDocument());
+    expect(screen.getByRole('radio', { name: '이름순' })).toBeChecked();
+  });
+
   it('영상을 누르면 재생 오버레이가 열리고 닫힌다', async () => {
     renderScreen(<Videos />);
     const title = '1강 쉽고 짧은 영어 듣다보면 외워져요';

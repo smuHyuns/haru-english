@@ -44,3 +44,11 @@ export function deriveVideoForDay(date: DateStr, catalog: Video[]): Video | null
   if (catalog.length === 0) return null;
   return catalog[wrap(dayIndex(date), catalog.length)]!;
 }
+
+/** 그날부터 count 일치. 카탈로그가 count 보다 짧으면 있는 만큼만 (같은 편이 겹치지 않게) */
+export function deriveVideosFromDay(date: DateStr, catalog: Video[], count: number): Video[] {
+  if (catalog.length === 0) return [];
+  const n = Math.min(count, catalog.length);
+  const start = dayIndex(date);
+  return Array.from({ length: n }, (_, i) => catalog[wrap(start + i, catalog.length)]!);
+}

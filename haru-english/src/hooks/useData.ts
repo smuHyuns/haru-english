@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { repo } from '@/data';
 import type { CategoryFilter, DateStr, Favorites } from '@/data/types';
+import { TODAY_VIDEOS } from '@/lib/constants';
 import { kstToday, parseDate } from '@/lib/date';
 import { computeStreak } from '@/lib/streak';
 import { qk } from '@/query/keys';
@@ -36,11 +37,12 @@ export function useVideos(category: CategoryFilter) {
   });
 }
 
-/** 오늘의 영상 한 편. 홈에서 매일 다른 영상을 보여주기 위한 것 */
-export function useTodayVideo() {
+/** 홈 캐러셀에 올릴 영상 — 오늘부터 TODAY_VIDEOS 일치 */
+export function useTodayVideos() {
+  const today = kstToday();
   return useQuery({
-    queryKey: qk.videoByDate(kstToday()),
-    queryFn: () => repo.getVideoByDate(kstToday()),
+    queryKey: qk.videosByDate(today, TODAY_VIDEOS),
+    queryFn: () => repo.getVideosByDate(today, TODAY_VIDEOS),
   });
 }
 

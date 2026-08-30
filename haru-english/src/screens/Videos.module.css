@@ -3,3 +3,19 @@
   flex-direction: column;
   gap: var(--gap-section);
 }
+
+/* 개수 표시(왼쪽) + 정렬 기준(오른쪽) */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-12);
+}
+
+.count {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-3);
+  /* 로딩 중 빈 문자열일 때도 줄 높이를 유지해 정렬 컨트롤이 안 튀게 한다 */
+  white-space: nowrap;
+}

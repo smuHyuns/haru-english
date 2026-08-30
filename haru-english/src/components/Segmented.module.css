@@ -23,3 +23,17 @@
   background: var(--surface);
   color: var(--text-1);
 }
+
+/* 내용 폭만 차지하는 변형 — 영상 목록의 정렬 기준.
+   높이는 52px(MIN_TOUCH_PX) 아래로 내리지 않는다. */
+.compact {
+  padding: var(--sp-4);
+  border-radius: var(--r-xs);
+}
+
+.compact .item {
+  flex: 0 0 auto;
+  height: 52px;
+  padding: 0 var(--sp-16);
+  font-size: 16px;
+}

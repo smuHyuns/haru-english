@@ -1,0 +1,76 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-14);
+}
+
+/*
+ * 가로 스크롤 트랙.
+ *
+ * 페이지 좌우 패딩을 음수 마진으로 상쇄하고 같은 값을 안쪽 패딩으로 되돌린다.
+ * 그래야 카드가 화면 가장자리까지 흘러 나가면서도 첫 카드는 본문과 나란히 선다.
+ */
+.track {
+  display: flex;
+  gap: var(--sp-12);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  /* 스냅 지점을 패딩 안쪽으로 맞춘다 */
+  scroll-padding-left: var(--pad-screen);
+  margin: 0 calc(-1 * var(--pad-screen));
+  padding: 0 var(--pad-screen);
+  /* iOS 관성 스크롤 */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+/* 카드 폭. 다음 카드가 살짝 보여야 '넘길 수 있다'는 게 드러난다 */
+.track > * {
+  flex: 0 0 86%;
+  scroll-snap-align: start;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-6);
+}
+
+.dot {
+  position: relative;
+  height: 8px;
+  width: 8px;
+  border-radius: var(--r-pill);
+  padding: 0;
+  background: var(--dot-inactive);
+  transition:
+    width 0.16s var(--ease),
+    background-color 0.16s var(--ease);
+}
+
+/* 겉은 8px 이지만 손가락이 닿는 영역은 52px 이상으로 넓힌다 (MIN_TOUCH_PX) */
+.dot::before {
+  content: '';
+  position: absolute;
+  inset: -22px -8px;
+}
+
+.dotActive {
+  width: 22px;
+  background: var(--accent);
+}
+
+/* 손가락으로 넘기는 화면이라, 애니메이션을 끈 사용자에겐 부드러운 스크롤도 끈다 */
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    scroll-behavior: auto;
+  }
+
+  .dot {
+    transition: none;
+  }
+}

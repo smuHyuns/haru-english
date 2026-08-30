@@ -1,13 +1,14 @@
 import { useState } from 'react';
 
 import Button from '@/components/Button';
+import Carousel from '@/components/Carousel';
 import IconButton from '@/components/IconButton';
 import { Card, InnerCard, Thumb } from '@/components/Surface';
 import VideoPlayer from '@/components/VideoPlayer';
 import { Play, Star, StarOutline } from '@/components/icons';
-import { thumbnailUrl, videoMeta } from '@/data/types';
+import { thumbnailUrl, videoMeta, type Video } from '@/data/types';
 import { useCategoryLabel } from '@/hooks/useCategoryLabel';
-import { useFavorites, useTodayVideo, useTodayWords } from '@/hooks/useData';
+import { useFavorites, useTodayVideos, useTodayWords } from '@/hooks/useData';
 import { useFavoriteToggle } from '@/hooks/useFavoriteToggle';
 import { useSpeak } from '@/hooks/useSpeak';
 
@@ -18,13 +19,13 @@ export default function Today() {
   const categoryLabel = useCategoryLabel();
 
   const { data: words } = useTodayWords();
-  const { data: pick } = useTodayVideo();
+  const { data: videos } = useTodayVideos();
   const { data: favorites } = useFavorites();
   const toggleFavorite = useFavoriteToggle();
 
   // 프로토타입과 동일: 인덱스는 음수도 허용하고 렌더할 때 모듈로로 정규화한다 (무한 순환)
   const [wordIndex, setWordIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState<Video | null>(null);
 
   if (!words || words.length === 0) {
     return (
@@ -94,26 +95,31 @@ export default function Today() {
         </div>
       </div>
 
-      {pick && (
+      {videos && videos.length > 0 && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>오늘 볼 영상</h2>
-          <button
-            type="button"
-            className={styles.videoCard}
-            aria-label={`${pick.title} 재생`}
-            onClick={() => setPlaying(true)}
-          >
-            <Thumb variant="large" src={thumbnailUrl(pick)} />
-            <div className={styles.videoBody}>
-              <span className={styles.videoCat}>{categoryLabel(pick.categoryId)}</span>
-              <span className={styles.videoTitle}>{pick.title}</span>
-              <span className={styles.videoMeta}>{videoMeta(pick)}</span>
-            </div>
-          </button>
+          <Carousel label="오늘 볼 영상" count={videos.length}>
+            {videos.map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                className={styles.videoCard}
+                aria-label={`${v.title} 재생`}
+                onClick={() => setPlaying(v)}
+              >
+                <Thumb variant="large" src={thumbnailUrl(v)} />
+                <div className={styles.videoBody}>
+                  <span className={styles.videoCat}>{categoryLabel(v.categoryId)}</span>
+                  <span className={styles.videoTitle}>{v.title}</span>
+                  <span className={styles.videoMeta}>{videoMeta(v)}</span>
+                </div>
+              </button>
+            ))}
+          </Carousel>
         </section>
       )}
 
-      {playing && pick && <VideoPlayer video={pick} onClose={() => setPlaying(false)} />}
+      {playing && <VideoPlayer video={playing} onClose={() => setPlaying(null)} />}
     </div>
   );
 }
