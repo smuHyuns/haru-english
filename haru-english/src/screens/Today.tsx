@@ -98,7 +98,7 @@ export default function Today() {
       {videos && videos.length > 0 && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>오늘 볼 영상</h2>
-          <Carousel label="오늘 볼 영상" count={videos.length}>
+          <Carousel label="오늘 볼 영상" count={videos.length} itemNoun="영상">
             {videos.map((v) => (
               <button
                 key={v.id}

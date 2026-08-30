@@ -130,6 +130,17 @@ describe('오늘 화면', () => {
     expect(dots[0]).toHaveAttribute('aria-current', 'true');
   });
 
+  it('이전/다음 영상 버튼이 있고, 양 끝에서는 눌리지 않는다', async () => {
+    renderToday();
+    await screen.findByText(expected()[0]!.title);
+
+    const prev = screen.getByRole('button', { name: '이전 영상' });
+    const next = screen.getByRole('button', { name: '다음 영상' });
+    // 첫 장이라 이전은 막혀 있다. 단어 카드와 달리 순환하지 않는다
+    expect(prev).toBeDisabled();
+    expect(next).toBeEnabled();
+  });
+
   it('아무 카드나 누르면 그 영상의 재생 오버레이가 열린다', async () => {
     const second = expected()[1]!;
     renderToday();

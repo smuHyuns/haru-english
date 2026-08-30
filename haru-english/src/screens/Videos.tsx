@@ -15,9 +15,10 @@ const VALID: CategoryFilter[] = ['all', 'daily', 'pack', 'speaking', 'study'];
 
 type SortId = 'order' | 'name';
 
+// 기본값이 앞에 온다 — URL 에 sort 파라미터가 없으면 이름순
 const SORTS = [
-  { id: 'order', label: '등록순' },
   { id: 'name', label: '이름순' },
+  { id: 'order', label: '등록순' },
 ] as const;
 
 /*
@@ -31,7 +32,7 @@ export default function Videos() {
 
   const rawCat = params.get('cat') as CategoryFilter | null;
   const cat: CategoryFilter = rawCat && VALID.includes(rawCat) ? rawCat : 'all';
-  const sort: SortId = params.get('sort') === 'name' ? 'name' : 'order';
+  const sort: SortId = params.get('sort') === 'order' ? 'order' : 'name';
 
   const { data: categories } = useCategories();
   const { data: videos } = useVideos(cat);
@@ -79,7 +80,7 @@ export default function Videos() {
           semantics="radio"
           options={SORTS}
           value={sort}
-          onChange={(id) => setParam('sort', id === 'order' ? null : id)}
+          onChange={(id) => setParam('sort', id === 'name' ? null : id)}
         />
       </div>
 

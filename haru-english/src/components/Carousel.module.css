@@ -8,15 +8,14 @@
  * 가로 스크롤 트랙.
  *
  * 페이지 좌우 패딩을 음수 마진으로 상쇄하고 같은 값을 안쪽 패딩으로 되돌린다.
- * 그래야 카드가 화면 가장자리까지 흘러 나가면서도 첫 카드는 본문과 나란히 선다.
+ * 이렇게 하면 카드 폭이 본문 폭과 정확히 같아지고(단어 카드와 나란히 선다),
+ * scroll-snap-align:center 로 스냅했을 때 좌우 여백이 20px 로 대칭이 된다.
  */
 .track {
   display: flex;
   gap: var(--sp-12);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  /* 스냅 지점을 패딩 안쪽으로 맞춘다 */
-  scroll-padding-left: var(--pad-screen);
   margin: 0 calc(-1 * var(--pad-screen));
   padding: 0 var(--pad-screen);
   /* iOS 관성 스크롤 */
@@ -28,10 +27,14 @@
   display: none;
 }
 
-/* 카드 폭. 다음 카드가 살짝 보여야 '넘길 수 있다'는 게 드러난다 */
+/*
+ * 카드 폭 = 트랙 안쪽 폭 = 본문 폭.
+ * center 로 스냅해야 첫 장도 마지막 장도 가운데에 선다.
+ * start 로 두면 첫 장이 왼쪽에 붙어 좌우가 어긋나 보인다.
+ */
 .track > * {
-  flex: 0 0 86%;
-  scroll-snap-align: start;
+  flex: 0 0 100%;
+  scroll-snap-align: center;
 }
 
 .dots {
@@ -62,6 +65,16 @@
 .dotActive {
   width: 22px;
   background: var(--accent);
+}
+
+/* 이전/다음 — 단어 카드의 버튼 쌍과 같은 배치 */
+.pair {
+  display: flex;
+  gap: var(--sp-12);
+}
+
+.pair > * {
+  flex: 1;
 }
 
 /* 손가락으로 넘기는 화면이라, 애니메이션을 끈 사용자에겐 부드러운 스크롤도 끈다 */
