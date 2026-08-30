@@ -8,7 +8,7 @@ import styles from './Carousel.module.css';
 type Props = {
   /** 스크린리더용 — 예: "오늘 볼 영상" */
   label: string;
-  /** 항목 수. 점 인디케이터와 이전/다음 버튼 상태를 그리는 데 쓴다 */
+  /** 항목 수. 점 인디케이터를 그리고 순환 인덱스를 계산하는 데 쓴다 */
   count: number;
   /** 이전/다음 버튼 글자 — 예: "영상" → "이전 영상" */
   itemNoun: string;
@@ -51,19 +51,27 @@ export default function Carousel({ label, count, itemNoun, children }: Props) {
     };
   }, [count]);
 
-  const goTo = useCallback((i: number) => {
-    const el = trackRef.current;
-    const card = el?.children[i] as HTMLElement | undefined;
-    if (!el || !card) return;
-    /*
-     * scrollIntoView 를 쓰면 세로 스크롤까지 건드려 페이지가 튄다.
-     * 카드 중앙을 스크롤포트 중앙에 맞추는 값을 직접 계산한다.
-     */
-    el.scrollTo({
-      left: card.offsetLeft - el.offsetLeft - (el.clientWidth - card.clientWidth) / 2,
-      behavior: 'smooth',
-    });
-  }, []);
+  /** 목록 끝에서 반대쪽으로 넘어간다 — 다섯 편을 계속 돌려 볼 수 있게 */
+  const goTo = useCallback(
+    (raw: number) => {
+      const el = trackRef.current;
+      const i = ((raw % count) + count) % count;
+      const card = el?.children[i] as HTMLElement | undefined;
+      if (!el || !card) return;
+      /*
+       * scrollIntoView 를 쓰면 세로 스크롤까지 건드려 페이지가 튄다.
+       * 카드 중앙을 스크롤포트 중앙에 맞추는 값을 직접 계산한다.
+       *
+       * 끝 → 처음은 그대로 부드럽게 되감는다. 순간이동시키면 넘긴 건지
+       * 되돌아온 건지 알 수 없는데, 다섯 장이라 되감는 게 눈에 보인다.
+       */
+      el.scrollTo({
+        left: card.offsetLeft - el.offsetLeft - (el.clientWidth - card.clientWidth) / 2,
+        behavior: 'smooth',
+      });
+    },
+    [count],
+  );
 
   return (
     <div className={styles.wrap}>
@@ -93,23 +101,13 @@ export default function Carousel({ label, count, itemNoun, children }: Props) {
             ))}
           </div>
 
+          {/* 단어 카드와 같이 순환한다. 손가락으로 넘길 땐 스크롤 컨테이너라
+              양 끝에서 멈추지만, 버튼과 점으로는 계속 돌 수 있다. */}
           <div className={styles.pair}>
-            {/* 단어 카드와 달리 순환하지 않는다 — 스크롤 위치가 끝에서 처음으로
-                튀면 넘긴 건지 되돌아온 건지 알기 어렵다. 끝에서는 흐리게 둔다. */}
-            <Button
-              variant="secondary"
-              height={66}
-              disabled={index === 0}
-              onClick={() => goTo(index - 1)}
-            >
+            <Button variant="secondary" height={66} onClick={() => goTo(index - 1)}>
               이전 {itemNoun}
             </Button>
-            <Button
-              variant="secondary"
-              height={66}
-              disabled={index === count - 1}
-              onClick={() => goTo(index + 1)}
-            >
+            <Button variant="secondary" height={66} onClick={() => goTo(index + 1)}>
               다음 {itemNoun}
             </Button>
           </div>

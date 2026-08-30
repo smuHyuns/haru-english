@@ -130,15 +130,40 @@ describe('오늘 화면', () => {
     expect(dots[0]).toHaveAttribute('aria-current', 'true');
   });
 
-  it('이전/다음 영상 버튼이 있고, 양 끝에서는 눌리지 않는다', async () => {
+  it('이전/다음 영상 버튼은 양 끝에서도 막히지 않는다 (순환)', async () => {
     renderToday();
     await screen.findByText(expected()[0]!.title);
 
-    const prev = screen.getByRole('button', { name: '이전 영상' });
-    const next = screen.getByRole('button', { name: '다음 영상' });
-    // 첫 장이라 이전은 막혀 있다. 단어 카드와 달리 순환하지 않는다
-    expect(prev).toBeDisabled();
-    expect(next).toBeEnabled();
+    // 첫 장에서도 '이전 영상' 이 살아 있어야 한다 — 마지막 편으로 돌아간다
+    expect(screen.getByRole('button', { name: '이전 영상' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: '다음 영상' })).toBeEnabled();
+  });
+
+  it('첫 장에서 이전을 눌러도 터지지 않고 마지막 편으로 감는다', async () => {
+    /*
+     * jsdom 은 레이아웃이 없어 실제 스크롤은 확인할 수 없다. 어디로 감으라고
+     * 했는지(scrollTo 인자)만 본다. 스텁을 프로토타입에 두므로 반드시 되돌린다 —
+     * 남겨 두면 다음 테스트가 있지도 않은 scrollTo 로 통과할 수 있다.
+     */
+    const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'scrollTo');
+    const scrollTo = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, 'scrollTo', {
+      value: scrollTo,
+      writable: true,
+      configurable: true,
+    });
+
+    try {
+      renderToday();
+      await screen.findByText(expected()[0]!.title);
+      await userEvent.click(screen.getByRole('button', { name: '이전 영상' }));
+
+      expect(scrollTo).toHaveBeenCalledTimes(1);
+      expect(scrollTo.mock.calls[0]![0]).toMatchObject({ behavior: 'smooth' });
+    } finally {
+      if (original) Object.defineProperty(HTMLElement.prototype, 'scrollTo', original);
+      else delete (HTMLElement.prototype as Partial<HTMLElement>).scrollTo;
+    }
   });
 
   it('아무 카드나 누르면 그 영상의 재생 오버레이가 열린다', async () => {
