@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { videoMeta, type Video } from '@/data/types';
+import { thumbnailUrl, videoMeta, type Video } from '@/data/types';
 import { useCategoryLabel } from '@/hooks/useCategoryLabel';
-import { useToast } from '@/hooks/useToast';
 
 import IconButton from './IconButton';
 import { Thumb } from './Surface';
@@ -13,26 +12,34 @@ type Props = {
   video: Video;
   favorite: boolean;
   onToggleFavorite: () => void;
+  onPlay: () => void;
   /** 즐겨찾기 탭은 흰 배경 + accent 별 하나만 쓴다 */
   variant?: 'list' | 'saved';
 };
 
-export default function VideoRow({ video, favorite, onToggleFavorite, variant = 'list' }: Props) {
+export default function VideoRow({
+  video,
+  favorite,
+  onToggleFavorite,
+  onPlay,
+  variant = 'list',
+}: Props) {
   const label = useCategoryLabel();
-  const toast = useToast();
 
   // 즐겨찾기 탭에서는 항상 켜진 별(누르면 목록에서 빠짐)
   const tone = variant === 'saved' ? 'onWhite' : favorite ? 'onSoft' : 'offWhite';
 
   return (
     <li className={styles.row}>
+      {/* 라벨을 명시하지 않으면 접근성 이름이 '생활회화1강 …20분 · 1일1영어' 로
+          이어붙어 읽힌다. 무엇을 하는 버튼인지가 빠진다. */}
       <button
         type="button"
         className={styles.main}
-        // 영상 재생은 아직 미구현 — 실제로는 유튜브 임베드 또는 딥링크
-        onClick={() => toast.show('준비 중인 기능이에요')}
+        aria-label={`${video.title} 재생`}
+        onClick={onPlay}
       >
-        <Thumb variant="list" />
+        <Thumb variant="list" src={thumbnailUrl(video)} />
         <span className={styles.text}>
           <span className={styles.cat}>{label(video.categoryId)}</span>
           <span className={styles.title}>{video.title}</span>

@@ -6,6 +6,10 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
 import ToastProvider from '@/components/ToastProvider';
+import { VIDEOS } from '@/data/mock/content';
+import { videoMeta } from '@/data/types';
+import { deriveVideoForDay } from '@/lib/curriculum';
+import { kstToday } from '@/lib/date';
 
 import Today from './Today';
 
@@ -83,13 +87,29 @@ describe('오늘 화면', () => {
     );
   });
 
-  it('단어를 넘겨도 오늘 볼 영상은 첫 번째로 고정된다 (프로토타입 의도)', async () => {
+  it('오늘 볼 영상은 날짜로 정해지고, 단어를 넘겨도 바뀌지 않는다', async () => {
+    // 예전엔 videos[0] 고정이라 매일 같은 영상이 떴다. 이제 커리큘럼이 날짜를 따라간다.
+    const expected = deriveVideoForDay(
+      kstToday(),
+      VIDEOS.filter((v) => v.categoryId === 'daily'),
+    )!;
+
     renderToday();
-    const title = await screen.findByText('아침에 쓰는 인사 표현 10가지');
-    expect(title).toBeInTheDocument();
-    expect(screen.getByText('8분 · Everyday English')).toBeInTheDocument();
+    expect(await screen.findByText(expected.title)).toBeInTheDocument();
+    expect(screen.getByText(videoMeta(expected))).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: '다음 단어' }));
-    expect(screen.getByText('아침에 쓰는 인사 표현 10가지')).toBeInTheDocument();
+    expect(screen.getByText(expected.title)).toBeInTheDocument();
+  });
+
+  it('오늘 볼 영상을 누르면 재생 오버레이가 열린다', async () => {
+    const expected = deriveVideoForDay(
+      kstToday(),
+      VIDEOS.filter((v) => v.categoryId === 'daily'),
+    )!;
+
+    renderToday();
+    await userEvent.click(await screen.findByRole('button', { name: `${expected.title} 재생` }));
+    expect(await screen.findByRole('dialog', { name: expected.title })).toBeInTheDocument();
   });
 });

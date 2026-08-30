@@ -1,0 +1,79 @@
+/* 재생 오버레이 — 탭바까지 덮는다. 영상 보는 동안엔 앱 UI 가 방해가 된다 */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  /* 노치·홈 인디케이터 침범 방지 (index.html 의 viewport-fit=cover 와 짝) */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--sp-8) var(--sp-12);
+}
+
+/* 16:9 를 유지하며 화면 폭에 맞춘다 */
+.stage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  display: grid;
+  place-items: center;
+}
+
+.frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.missing {
+  color: #d0d5da;
+  font-size: 16px;
+}
+
+.info {
+  padding: var(--sp-20) var(--sp-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  /* 제목이 긴 영상(최대 95자)이 있어 넘치면 이 영역만 스크롤된다 */
+  overflow-y: auto;
+}
+
+.title {
+  margin: 0;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.meta {
+  margin: 0;
+  color: #98a2ad;
+  font-size: 16px;
+}
+
+.external {
+  align-self: flex-start;
+  margin-top: var(--sp-8);
+  /* 터치 타깃 52px 확보 (MIN_TOUCH_PX) */
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--sp-16);
+  border-radius: var(--r-sm);
+  background: rgb(255 255 255 / 12%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}

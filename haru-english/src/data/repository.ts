@@ -28,6 +28,13 @@ export interface Repository {
   /** GET /videos?category= */
   getVideos(category: CategoryFilter): Promise<Video[]>;
 
+  /**
+   * 그날의 영상 한 편 (daily_videos).
+   * 커리큘럼이 그 날짜까지 안 채워졌으면 null 이 아니라 순환 폴백을 돌려준다 —
+   * 홈에서 '오늘의 영상' 자리가 비면 화면이 무너진다.
+   */
+  getVideoByDate(date: DateStr): Promise<Video | null>;
+
   /** GET /attendance?year=&month= */
   getAttendance(year: number, month: number): Promise<AttendanceMonth>;
 

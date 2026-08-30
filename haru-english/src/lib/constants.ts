@@ -7,6 +7,13 @@ export const TOAST_MS = 1800;
 /** 하루 학습 단어 수 */
 export const PER_DAY = 3;
 
+/**
+ * 커리큘럼 시작일. daily_words · daily_videos 시드가 이 날부터 채워진다.
+ * 커리큘럼이 떨어진 뒤(어댑터 폴백)에도 이 날을 기준으로 순환시켜
+ * DB 가 채워져 있든 아니든 같은 날엔 같은 콘텐츠가 나오게 한다.
+ */
+export const CURRICULUM_START = '2026-05-01';
+
 /** speechSynthesis 발화 속도 */
 export const SPEECH_RATE_SLOW = 0.8;
 export const SPEECH_RATE_NORMAL = 1;

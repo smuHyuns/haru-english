@@ -6,6 +6,7 @@ export const qk = {
   wordsByDate: (date: DateStr) => ['words', 'date', date] as const,
   categories: () => ['categories'] as const,
   videos: (category: CategoryFilter) => ['videos', category] as const,
+  videoByDate: (date: DateStr) => ['videos', 'date', date] as const,
   attendance: (year: number, month: number) => ['attendance', year, month] as const,
   recentAttendance: () => ['attendance', 'recent'] as const,
   profile: () => ['profile'] as const,

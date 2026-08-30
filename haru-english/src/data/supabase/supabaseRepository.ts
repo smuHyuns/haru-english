@@ -1,4 +1,5 @@
 import { PER_DAY } from '@/lib/constants';
+import { deriveVideoForDay } from '@/lib/curriculum';
 import { addDays, daysInMonth, kstToday, parseDate, toDateStr } from '@/lib/date';
 
 import type { Repository } from '../repository';
@@ -40,10 +41,12 @@ type VideoRow = {
   channel: string;
   duration_sec: number;
   thumbnail_url: string | null;
+  sort_order: number;
 };
 
 const WORD_COLS = 'id, en, ipa, ko, ex_en, ex_ko';
-const VIDEO_COLS = 'id, youtube_id, category_id, title, channel, duration_sec, thumbnail_url';
+const VIDEO_COLS =
+  'id, youtube_id, category_id, title, channel, duration_sec, thumbnail_url, sort_order';
 
 function toWord(r: WordRow): Word {
   return { id: r.id, en: r.en, ipa: r.ipa, ko: r.ko, exEn: r.ex_en, exKo: r.ex_ko };
@@ -122,7 +125,28 @@ export const supabaseRepository: Repository = {
   async getVideos(category: CategoryFilter): Promise<Video[]> {
     const base = getSupabase().from('videos').select(VIDEO_COLS).eq('is_active', true);
     const q = category === 'all' ? base : base.eq('category_id', category);
-    return unwrap(await q.order('id').returns<VideoRow[]>(), '영상 목록').map(toVideo);
+    // id 가 유튜브 영상 ID(무작위 11자)라 정렬 기준이 못 된다. sort_order 로 커리큘럼 순.
+    // 카테고리를 안 고른 '전체' 에서도 생활회화 1강부터 보이도록 category_id 를 먼저 본다.
+    return unwrap(
+      await q.order('category_id').order('sort_order').returns<VideoRow[]>(),
+      '영상 목록',
+    ).map(toVideo);
+  },
+
+  async getVideoByDate(date: DateStr): Promise<Video | null> {
+    const rows = unwrap(
+      await getSupabase()
+        .from('daily_videos')
+        .select(`video_id, videos(${VIDEO_COLS})`)
+        .eq('learn_date', date)
+        .returns<{ video_id: string; videos: VideoRow | null }[]>(),
+      '오늘의 영상',
+    );
+    const row = rows[0]?.videos;
+    if (row) return toVideo(row);
+
+    // 폴백 — 커리큘럼이 그 날짜까지 안 채워진 경우. 생활회화를 순환시킨다.
+    return deriveVideoForDay(date, await supabaseRepository.getVideos('daily'));
   },
 
   async getAttendance(year: number, month: number): Promise<AttendanceMonth> {

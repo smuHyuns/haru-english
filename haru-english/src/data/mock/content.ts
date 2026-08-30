@@ -107,74 +107,87 @@ export const WORDS: Word[] = [
 
 export const CATEGORIES: Category[] = [
   { id: 'all', label: '전체', sortOrder: 0 },
-  { id: 'daily', label: '일상', sortOrder: 1 },
-  { id: 'travel', label: '여행', sortOrder: 2 },
-  { id: 'restaurant', label: '식당', sortOrder: 3 },
-  { id: 'shopping', label: '쇼핑', sortOrder: 4 },
-  { id: 'hospital', label: '병원', sortOrder: 5 },
+  { id: 'daily', label: '생활회화', sortOrder: 1 },
+  { id: 'pack', label: '몰아듣기', sortOrder: 2 },
+  { id: 'speaking', label: '말하기', sortOrder: 3 },
+  { id: 'study', label: '공부법', sortOrder: 4 },
 ];
 
+/*
+ * 실제 콘텐츠(439개)의 축소판. supabase 시드에서 카테고리마다 앞쪽 몇 개를 그대로 뽑았다.
+ * 목표는 '적당한 가짜'가 아니라 '진짜의 일부' — 제목 길이·회차 표기·유튜브 ID 형식이
+ * 실물과 같아야 목으로 개발한 화면이 배포에서 안 깨진다.
+ */
 export const VIDEOS: Video[] = [
   {
-    id: 'v1',
-    youtubeId: null,
+    id: 'GGvsQdnGg_E',
+    youtubeId: 'GGvsQdnGg_E',
     categoryId: 'daily',
-    title: '아침에 쓰는 인사 표현 10가지',
-    channel: 'Everyday English',
-    durationSec: 480,
+    title: '1강 쉽고 짧은 영어 듣다보면 외워져요',
+    channel: '1일1영어',
+    durationSec: 1197,
     thumbnailUrl: null,
   },
   {
-    id: 'v2',
-    youtubeId: null,
-    categoryId: 'travel',
-    title: '공항에서 바로 쓰는 문장',
-    channel: 'Travel Talk',
-    durationSec: 720,
-    thumbnailUrl: null,
-  },
-  {
-    id: 'v3',
-    youtubeId: null,
-    categoryId: 'restaurant',
-    title: '카페에서 주문하기',
-    channel: 'Slow English',
-    durationSec: 360,
-    thumbnailUrl: null,
-  },
-  {
-    id: 'v4',
-    youtubeId: null,
-    categoryId: 'shopping',
-    title: '마트에서 물건 찾을 때',
-    channel: 'Daily Phrases',
-    durationSec: 540,
-    thumbnailUrl: null,
-  },
-  {
-    id: 'v5',
-    youtubeId: null,
+    id: 'w15gqcNBJ2Q',
+    youtubeId: 'w15gqcNBJ2Q',
     categoryId: 'daily',
-    title: '날씨 이야기로 대화 시작하기',
-    channel: 'Small Talk',
-    durationSec: 420,
+    title: '2강 짧은 문장으로 영어로 대화 할 수 있어요',
+    channel: '1일1영어',
+    durationSec: 1142,
     thumbnailUrl: null,
   },
   {
-    id: 'v6',
-    youtubeId: null,
-    categoryId: 'hospital',
-    title: '병원에서 증상 말하기',
-    channel: 'Real Life English',
-    durationSec: 600,
+    id: 'HmhlNSLTrHE',
+    youtubeId: 'HmhlNSLTrHE',
+    categoryId: 'daily',
+    title: '3강 꾸준히 듣고 따라하면 영어 말할 수 있어요',
+    channel: '1일1영어',
+    durationSec: 1175,
+    thumbnailUrl: null,
+  },
+  {
+    id: 'KbrHRTzpO-k',
+    youtubeId: 'KbrHRTzpO-k',
+    categoryId: 'pack',
+    title: '영어회화 1000문장 영어 잘하고 싶으면 꼭 들으세요',
+    channel: '1일1영어',
+    durationSec: 19151,
+    thumbnailUrl: null,
+  },
+  {
+    id: 'cgQK_ylwiEY',
+    youtubeId: 'cgQK_ylwiEY',
+    categoryId: 'pack',
+    title: '해외여행 영어회화 몰아보기',
+    channel: '주아쌤_소리튠영어',
+    durationSec: 3383,
+    thumbnailUrl: null,
+  },
+  {
+    id: 'CzpI0bgBXU0',
+    youtubeId: 'CzpI0bgBXU0',
+    categoryId: 'speaking',
+    title: '영어 소리튜닝 프로젝트 Day 1',
+    channel: '주아쌤_소리튠영어',
+    durationSec: 959,
+    thumbnailUrl: null,
+  },
+  {
+    id: 'q88YW7elHOM',
+    youtubeId: 'q88YW7elHOM',
+    categoryId: 'study',
+    title: '영어 단어 1500개 · 중등 필수 영단어',
+    channel: '기초영어 Step by Step',
+    durationSec: 12392,
     thumbnailUrl: null,
   },
 ];
 
-/** 프로토타입 기본 즐겨찾기 (receipt, appointment / v2) */
+/** 프로토타입 기본 즐겨찾기 (단어 2개 + 영상 1개) */
 export const SEED_FAVORITES = {
   words: ['receipt', 'appointment'],
-  videos: ['v2'],
+  videos: ['cgQK_ylwiEY'],
 };
 
 /** 가입월 — 캘린더 이동 하한 */

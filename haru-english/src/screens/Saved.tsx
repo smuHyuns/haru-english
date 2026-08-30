@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import IconButton from '@/components/IconButton';
 import Segmented from '@/components/Segmented';
 import { EmptyState } from '@/components/Surface';
+import VideoPlayer from '@/components/VideoPlayer';
 import VideoRow, { VideoList } from '@/components/VideoRow';
 import { Star } from '@/components/icons';
 import { useFavorites, useTodayWords, useVideos } from '@/hooks/useData';
 import { useFavoriteToggle } from '@/hooks/useFavoriteToggle';
+import type { Video } from '@/data/types';
 import { useSpeak } from '@/hooks/useSpeak';
 
 import styles from './Saved.module.css';
@@ -27,6 +30,8 @@ export default function Saved() {
   const { data: videos } = useVideos('all');
   const toggleFavorite = useFavoriteToggle();
   const { speakWord } = useSpeak();
+
+  const [playing, setPlaying] = useState<Video | null>(null);
 
   const favWords = words?.filter((w) => favorites?.words.includes(w.id)) ?? [];
   const favVideos = videos?.filter((v) => favorites?.videos.includes(v.id)) ?? [];
@@ -101,10 +106,13 @@ export default function Saved() {
               favorite
               variant="saved"
               onToggleFavorite={() => toggleFavorite('videos', v.id, true)}
+              onPlay={() => setPlaying(v)}
             />
           ))}
         </VideoList>
       )}
+
+      {playing && <VideoPlayer video={playing} onClose={() => setPlaying(null)} />}
     </div>
   );
 }

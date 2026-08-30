@@ -65,6 +65,23 @@ export default defineConfig({
               cacheableResponse: { statuses: [0, 200] },
             },
           },
+          {
+            /*
+             * 유튜브 썸네일. 영상이 439개라 precache 는 불가능하고, 그럴 이유도 없다 —
+             * 실제로 본 영상만 쌓인다. 이게 없으면 비행기 모드에서 즐겨찾기 목록의
+             * 썸네일이 전부 스트라이프 플레이스홀더로 떨어진다.
+             *
+             * statuses 에 0 을 넣는 이유: i.ytimg.com 응답이 opaque(CORS 없는 no-cors)라
+             * status 가 0 으로 온다. 0 을 빼면 아무것도 캐시되지 않는다.
+             */
+            urlPattern: ({ url }) => url.hostname === 'i.ytimg.com',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'haru-thumbs',
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
         ],
         /*
          * Supabase 응답은 서비스워커로 캐시하지 않는다.

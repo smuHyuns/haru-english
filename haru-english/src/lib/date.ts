@@ -130,3 +130,8 @@ export function shiftMonth(
   const total = year * 12 + (month - 1) + delta;
   return { year: Math.floor(total / 12), month: (total % 12) + 1 };
 }
+
+/** 두 날짜 사이의 일수 (to - from). 커리큘럼 N일차를 구하는 데 쓴다 */
+export function daysBetween(from: DateStr, to: DateStr): number {
+  return Math.round((utcOf(to).getTime() - utcOf(from).getTime()) / 86_400_000);
+}

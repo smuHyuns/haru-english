@@ -38,6 +38,14 @@ export function useVideos(category: CategoryFilter) {
   });
 }
 
+/** 오늘의 영상 한 편. 홈에서 매일 다른 영상을 보여주기 위한 것 */
+export function useTodayVideo() {
+  return useQuery({
+    queryKey: qk.videoByDate(kstToday()),
+    queryFn: () => repo.getVideoByDate(kstToday()),
+  });
+}
+
 export function useAttendance(year: number, month: number) {
   return useQuery({
     queryKey: qk.attendance(year, month),

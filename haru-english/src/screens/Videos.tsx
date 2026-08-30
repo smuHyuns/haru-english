@@ -1,14 +1,16 @@
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Chip, ChipRow } from '@/components/Chip';
+import VideoPlayer from '@/components/VideoPlayer';
 import VideoRow, { VideoList } from '@/components/VideoRow';
-import type { CategoryFilter } from '@/data/types';
+import type { CategoryFilter, Video } from '@/data/types';
 import { useCategories, useFavorites, useVideos } from '@/hooks/useData';
 import { useFavoriteToggle } from '@/hooks/useFavoriteToggle';
 
 import styles from './Videos.module.css';
 
-const VALID: CategoryFilter[] = ['all', 'daily', 'travel', 'restaurant', 'shopping', 'hospital'];
+const VALID: CategoryFilter[] = ['all', 'daily', 'pack', 'speaking', 'study'];
 
 export default function Videos() {
   const [params, setParams] = useSearchParams();
@@ -20,6 +22,8 @@ export default function Videos() {
   const { data: videos } = useVideos(cat);
   const { data: favorites } = useFavorites();
   const toggleFavorite = useFavoriteToggle();
+
+  const [playing, setPlaying] = useState<Video | null>(null);
 
   const pick = (id: CategoryFilter) => {
     // 필터를 URL 에 담아 새로고침·뒤로가기에서 유지되게 한다
@@ -45,10 +49,13 @@ export default function Videos() {
               video={v}
               favorite={fav}
               onToggleFavorite={() => toggleFavorite('videos', v.id, fav)}
+              onPlay={() => setPlaying(v)}
             />
           );
         })}
       </VideoList>
+
+      {playing && <VideoPlayer video={playing} onClose={() => setPlaying(null)} />}
     </div>
   );
 }

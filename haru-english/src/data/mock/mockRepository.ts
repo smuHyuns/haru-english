@@ -1,4 +1,5 @@
 import { PER_DAY } from '@/lib/constants';
+import { deriveVideoForDay } from '@/lib/curriculum';
 import { addDays, daysInMonth, kstToday, parseDate } from '@/lib/date';
 
 import type { Repository } from '../repository';
@@ -108,6 +109,15 @@ function createMockRepository(): MockRepository {
 
     async getVideos(category: CategoryFilter): Promise<Video[]> {
       return category === 'all' ? VIDEOS : VIDEOS.filter((v) => v.categoryId === category);
+    },
+
+    async getVideoByDate(date: DateStr): Promise<Video | null> {
+      // 목에는 daily_videos 가 없으므로 항상 폴백 규칙을 쓴다.
+      // supabase 어댑터도 커리큘럼이 떨어지면 같은 함수로 떨어진다.
+      return deriveVideoForDay(
+        date,
+        VIDEOS.filter((v) => v.categoryId === 'daily'),
+      );
     },
 
     async getAttendance(year: number, month: number): Promise<AttendanceMonth> {

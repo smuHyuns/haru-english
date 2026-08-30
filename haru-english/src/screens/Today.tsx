@@ -1,30 +1,30 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import { Card, InnerCard, Thumb } from '@/components/Surface';
+import VideoPlayer from '@/components/VideoPlayer';
 import { Play, Star, StarOutline } from '@/components/icons';
-import { videoMeta } from '@/data/types';
+import { thumbnailUrl, videoMeta } from '@/data/types';
 import { useCategoryLabel } from '@/hooks/useCategoryLabel';
-import { useFavorites, useTodayWords, useVideos } from '@/hooks/useData';
+import { useFavorites, useTodayVideo, useTodayWords } from '@/hooks/useData';
 import { useFavoriteToggle } from '@/hooks/useFavoriteToggle';
 import { useSpeak } from '@/hooks/useSpeak';
 
 import styles from './Today.module.css';
 
 export default function Today() {
-  const navigate = useNavigate();
   const { speakWord, speakExample } = useSpeak();
   const categoryLabel = useCategoryLabel();
 
   const { data: words } = useTodayWords();
-  const { data: videos } = useVideos('all');
+  const { data: pick } = useTodayVideo();
   const { data: favorites } = useFavorites();
   const toggleFavorite = useFavoriteToggle();
 
   // 프로토타입과 동일: 인덱스는 음수도 허용하고 렌더할 때 모듈로로 정규화한다 (무한 순환)
   const [wordIndex, setWordIndex] = useState(0);
+  const [playing, setPlaying] = useState(false);
 
   if (!words || words.length === 0) {
     return (
@@ -38,9 +38,6 @@ export default function Today() {
   const i = ((wordIndex % words.length) + words.length) % words.length;
   const word = words[i]!;
   const isFav = favorites?.words.includes(word.id) ?? false;
-
-  // 프로토타입 의도: 단어를 넘겨도 '오늘 볼 영상'은 첫 번째로 고정된다
-  const pick = videos?.[0];
 
   return (
     <div className={styles.page}>
@@ -100,8 +97,13 @@ export default function Today() {
       {pick && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>오늘 볼 영상</h2>
-          <button type="button" className={styles.videoCard} onClick={() => navigate('/videos')}>
-            <Thumb variant="large" />
+          <button
+            type="button"
+            className={styles.videoCard}
+            aria-label={`${pick.title} 재생`}
+            onClick={() => setPlaying(true)}
+          >
+            <Thumb variant="large" src={thumbnailUrl(pick)} />
             <div className={styles.videoBody}>
               <span className={styles.videoCat}>{categoryLabel(pick.categoryId)}</span>
               <span className={styles.videoTitle}>{pick.title}</span>
@@ -110,6 +112,8 @@ export default function Today() {
           </button>
         </section>
       )}
+
+      {playing && pick && <VideoPlayer video={pick} onClose={() => setPlaying(false)} />}
     </div>
   );
 }

@@ -50,7 +50,6 @@
   /* ── Thumbnail placeholder ──────────────── */
   --thumb-a: #eef1f4;
   --thumb-b: #e6eaee;
-  --thumb-label: #98a2ad;
   --thumb-stripe: repeating-linear-gradient(
     135deg,
     var(--thumb-a) 0 10px,

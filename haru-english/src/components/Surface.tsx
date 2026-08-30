@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { cx } from '@/lib/cx';
 
@@ -33,24 +33,37 @@ export function InnerCard({
 /* ── Thumb ───────────────────────────────────────────── */
 
 /**
- * 유튜브 썸네일 자리. 아직 실제 이미지가 없어 대각선 스트라이프를 깔아 둔다.
- * Video.thumbnailUrl 이 채워지면 <img> 로 교체 (mds/02 §3).
+ * 유튜브 썸네일.
+ *
+ * src 가 없으면(또는 로드 실패하면) 대각선 스트라이프 플레이스홀더로 떨어진다.
+ * 오프라인에서 i.ytimg.com 이 안 잡히는 경우가 실제로 있어서, 실패를 정상 경로로 다룬다.
  */
 export function Thumb({
   variant,
+  src,
   className,
 }: {
   variant: 'large' | 'list';
+  src?: string | null;
   className?: string | undefined;
 }) {
-  if (variant === 'list') {
-    return <div className={cx(styles.thumb, styles.thumbList, className)} aria-hidden />;
+  const [failed, setFailed] = useState(false);
+  const shape = variant === 'list' ? styles.thumbList : styles.thumbLarge;
+
+  if (src && !failed) {
+    return (
+      <img
+        className={cx(styles.thumb, shape, styles.thumbImg, className)}
+        src={src}
+        alt=""
+        aria-hidden
+        loading="lazy"
+        decoding="async"
+        onError={() => setFailed(true)}
+      />
+    );
   }
-  return (
-    <div className={cx(styles.thumb, styles.thumbLarge, className)} aria-hidden>
-      <span className={styles.thumbLabel}>youtube thumbnail</span>
-    </div>
-  );
+  return <div className={cx(styles.thumb, shape, className)} aria-hidden />;
 }
 
 /* ── EmptyState ──────────────────────────────────────── */

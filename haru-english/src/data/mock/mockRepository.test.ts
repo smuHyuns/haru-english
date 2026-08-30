@@ -3,15 +3,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PER_DAY } from '@/lib/constants';
 import { kstToday, parseDate } from '@/lib/date';
 
-import { videoMeta } from '../types';
+import { thumbnailUrl, videoMeta } from '../types';
 import { CATEGORIES, JOINED_AT, VIDEOS, WORDS } from './content';
 import { createMockRepository, seedAttendance, wordsForDay } from './mockRepository';
 
 describe('콘텐츠 시드', () => {
-  it('단어 12개, 영상 6개, 카테고리 6개 (프로토타입과 동일)', () => {
+  it('단어 12개, 영상 7개, 카테고리 5개', () => {
     expect(WORDS).toHaveLength(12);
-    expect(VIDEOS).toHaveLength(6);
-    expect(CATEGORIES).toHaveLength(6);
+    // 영상은 실제 콘텐츠(439개)의 축소판이라 프로토타입의 6개와 개수가 다르다
+    expect(VIDEOS).toHaveLength(7);
+    expect(CATEGORIES).toHaveLength(5); // 전체 + 생활회화/몰아듣기/말하기/공부법
   });
 
   it('단어 id 가 slug 이고 중복이 없다', () => {
@@ -22,8 +23,23 @@ describe('콘텐츠 시드', () => {
   });
 
   it('videoMeta 를 duration/channel 에서 파생한다', () => {
-    expect(videoMeta(VIDEOS[0]!)).toBe('8분 · Everyday English');
-    expect(videoMeta(VIDEOS[1]!)).toBe('12분 · Travel Talk');
+    expect(videoMeta(VIDEOS[0]!)).toBe('20분 · 1일1영어'); // 1197초
+    expect(videoMeta(VIDEOS[1]!)).toBe('19분 · 1일1영어'); // 1142초
+  });
+
+  it('한 시간이 넘으면 시간 단위로 적는다 — 몰아듣기가 최대 3시간이라', () => {
+    const pack = VIDEOS.find((v) => v.categoryId === 'pack')!;
+    expect(videoMeta(pack)).toBe('5시간 19분 · 1일1영어'); // 19151초
+    expect(videoMeta({ ...pack, durationSec: 7200 })).toBe('2시간 · 1일1영어');
+    expect(videoMeta({ ...pack, durationSec: 3540 })).toBe('59분 · 1일1영어');
+  });
+
+  it('썸네일 주소를 영상 ID 에서 파생한다', () => {
+    expect(thumbnailUrl(VIDEOS[0]!)).toBe('https://i.ytimg.com/vi/GGvsQdnGg_E/mqdefault.jpg');
+    // 명시된 주소가 있으면 그걸 쓴다
+    expect(thumbnailUrl({ ...VIDEOS[0]!, thumbnailUrl: '/x.jpg' })).toBe('/x.jpg');
+    // 유튜브 ID 가 없으면 플레이스홀더로 떨어지도록 null
+    expect(thumbnailUrl({ ...VIDEOS[0]!, youtubeId: null })).toBeNull();
   });
 });
 
@@ -76,16 +92,16 @@ describe('mockRepository', () => {
   });
 
   it('카테고리 필터가 동작한다', async () => {
-    expect(await repo.getVideos('all')).toHaveLength(6);
+    expect(await repo.getVideos('all')).toHaveLength(7);
     const daily = await repo.getVideos('daily');
-    expect(daily).toHaveLength(2);
+    expect(daily).toHaveLength(3);
     expect(daily.every((v) => v.categoryId === 'daily')).toBe(true);
   });
 
   it('즐겨찾기 시드가 프로토타입과 같다', async () => {
     const fav = await repo.getFavorites();
     expect(fav.words).toEqual(['receipt', 'appointment']);
-    expect(fav.videos).toEqual(['v2']);
+    expect(fav.videos).toEqual(['cgQK_ylwiEY']);
   });
 
   it('즐겨찾기를 켜고 끌 수 있고, 중복 추가되지 않는다', async () => {
@@ -99,7 +115,7 @@ describe('mockRepository', () => {
 
   it('없는 항목을 꺼도 조용히 넘어간다', async () => {
     await repo.setFavoriteVideo('v99', false);
-    expect((await repo.getFavorites()).videos).toEqual(['v2']);
+    expect((await repo.getFavorites()).videos).toEqual(['cgQK_ylwiEY']);
   });
 
   it('반환된 배열을 밖에서 고쳐도 내부 상태가 안 바뀐다', async () => {
