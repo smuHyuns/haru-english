@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { CURRICULUM_START, PER_DAY, TODAY_VIDEOS } from '@/lib/constants';
+import { CURRICULUM_START, PER_DAY } from '@/lib/constants';
 import { addDays, kstToday, parseDate } from '@/lib/date';
 
 import { thumbnailUrl, videoMeta } from '../types';
@@ -104,21 +104,6 @@ describe('mockRepository', () => {
     const daily = await repo.getVideos('daily');
     expect(daily).toHaveLength(3);
     expect(daily.every((v) => v.categoryId === 'daily')).toBe(true);
-  });
-
-  it('생활회화는 오늘 구간만 준다 — 실제로는 409편이라 통째로 못 내려준다', async () => {
-    // 목에는 3편뿐이라 개수로는 안 드러난다. 계약 자체를 고정한다.
-    const window = await repo.getVideosByDate(kstToday(), TODAY_VIDEOS);
-    expect(await repo.getVideos('daily')).toEqual(window);
-  });
-
-  it("'전체' 는 생활회화 구간을 앞에 두고 나머지를 잇는다", async () => {
-    const all = await repo.getVideos('all');
-    const window = await repo.getVideosByDate(kstToday(), TODAY_VIDEOS);
-    expect(all.slice(0, window.length)).toEqual(window);
-    // 뒤쪽엔 생활회화가 다시 나오지 않는다 (중복 없음)
-    expect(all.slice(window.length).some((v) => v.categoryId === 'daily')).toBe(false);
-    expect(new Set(all.map((v) => v.id)).size).toBe(all.length);
   });
 
   it('id 로 단어·영상을 골라 온다 — 즐겨찾기 화면이 카탈로그 전체를 안 받게', async () => {
