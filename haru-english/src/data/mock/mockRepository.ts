@@ -1,4 +1,3 @@
-import { PER_DAY } from '@/lib/constants';
 import { deriveVideoForDay, deriveWordsForDay } from '@/lib/curriculum';
 import { addDays, daysInMonth, kstToday, parseDate } from '@/lib/date';
 
