@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { PER_DAY } from '@/lib/constants';
-import { kstToday, parseDate } from '@/lib/date';
+import { CURRICULUM_START, PER_DAY } from '@/lib/constants';
+import { addDays, kstToday, parseDate } from '@/lib/date';
 
 import { thumbnailUrl, videoMeta } from '../types';
 import { CATEGORIES, JOINED_AT, VIDEOS, WORDS } from './content';
@@ -43,7 +43,7 @@ describe('콘텐츠 시드', () => {
   });
 });
 
-describe('wordsForDay — 프로토타입 공식 WORDS[(일자*3 + slot) % 12]', () => {
+describe('wordsForDay — 커리큘럼 시작일부터 하루 PER_DAY 개씩', () => {
   it('하루 3개를 준다', () => {
     expect(wordsForDay('2026-08-12')).toHaveLength(PER_DAY);
   });
@@ -52,16 +52,24 @@ describe('wordsForDay — 프로토타입 공식 WORDS[(일자*3 + slot) % 12]',
     expect(wordsForDay('2026-08-12')).toEqual(wordsForDay('2026-08-12'));
   });
 
-  it('12일 → 인덱스 (36,37,38) % 12 = (0,1,2)', () => {
-    expect(wordsForDay('2026-08-12').map((w) => w.id)).toEqual([
+  it('시작일에는 카탈로그 앞에서 세 개', () => {
+    expect(wordsForDay(CURRICULUM_START).map((w) => w.id)).toEqual([
       'grocery',
       'appointment',
       'receipt',
     ]);
   });
 
-  it('월이 달라도 일자가 같으면 같은 단어 (프로토타입 동작 그대로)', () => {
-    expect(wordsForDay('2026-07-12')).toEqual(wordsForDay('2026-08-12'));
+  it('다음 날은 그 다음 세 개', () => {
+    expect(wordsForDay(addDays(CURRICULUM_START, 1)).map((w) => w.id)).toEqual([
+      'neighbor',
+      'refreshing',
+      'refund',
+    ]);
+  });
+
+  it('날짜가 다르면 단어도 다르다 — 예전엔 일자만 같으면 같았다', () => {
+    expect(wordsForDay('2026-07-12')).not.toEqual(wordsForDay('2026-08-12'));
   });
 });
 
@@ -96,6 +104,23 @@ describe('mockRepository', () => {
     const daily = await repo.getVideos('daily');
     expect(daily).toHaveLength(3);
     expect(daily.every((v) => v.categoryId === 'daily')).toBe(true);
+  });
+
+  it('id 로 단어·영상을 골라 온다 — 즐겨찾기 화면이 카탈로그 전체를 안 받게', async () => {
+    const words = await repo.getWordsByIds(['receipt', 'chilly']);
+    expect(words.map((w) => w.id)).toEqual(['receipt', 'chilly']);
+
+    const videos = await repo.getVideosByIds(['cgQK_ylwiEY']);
+    expect(videos.map((v) => v.id)).toEqual(['cgQK_ylwiEY']);
+  });
+
+  it('빈 id 목록이면 빈 배열 — 즐겨찾기가 하나도 없는 사용자', async () => {
+    expect(await repo.getWordsByIds([])).toEqual([]);
+    expect(await repo.getVideosByIds([])).toEqual([]);
+  });
+
+  it('없는 id 는 조용히 빠진다', async () => {
+    expect(await repo.getWordsByIds(['receipt', 'nope'])).toHaveLength(1);
   });
 
   it('즐겨찾기 시드가 프로토타입과 같다', async () => {

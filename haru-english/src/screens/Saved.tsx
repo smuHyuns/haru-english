@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/Surface';
 import VideoPlayer from '@/components/VideoPlayer';
 import VideoRow, { VideoList } from '@/components/VideoRow';
 import { Star } from '@/components/icons';
-import { useFavorites, useTodayWords, useVideos } from '@/hooks/useData';
+import { useFavoriteVideos, useFavoriteWords } from '@/hooks/useData';
 import { useFavoriteToggle } from '@/hooks/useFavoriteToggle';
 import type { Video } from '@/data/types';
 import { useSpeak } from '@/hooks/useSpeak';
@@ -25,16 +25,15 @@ export default function Saved() {
   const [params, setParams] = useSearchParams();
   const view: View = params.get('view') === 'videos' ? 'videos' : 'words';
 
-  const { data: favorites } = useFavorites();
-  const { data: words } = useTodayWords();
-  const { data: videos } = useVideos('all');
+  const { data: favWordsData } = useFavoriteWords();
+  const { data: favVideosData } = useFavoriteVideos();
   const toggleFavorite = useFavoriteToggle();
   const { speakWord } = useSpeak();
 
   const [playing, setPlaying] = useState<Video | null>(null);
 
-  const favWords = words?.filter((w) => favorites?.words.includes(w.id)) ?? [];
-  const favVideos = videos?.filter((v) => favorites?.videos.includes(v.id)) ?? [];
+  const favWords = favWordsData ?? [];
+  const favVideos = favVideosData ?? [];
 
   return (
     <div className={styles.page}>

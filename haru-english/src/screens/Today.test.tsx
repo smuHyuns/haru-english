@@ -3,15 +3,24 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import ToastProvider from '@/components/ToastProvider';
 import { VIDEOS } from '@/data/mock/content';
 import { videoMeta } from '@/data/types';
+import { CURRICULUM_START } from '@/lib/constants';
 import { deriveVideoForDay } from '@/lib/curriculum';
 import { kstToday } from '@/lib/date';
 
 import Today from './Today';
+
+/*
+ * '오늘'을 커리큘럼 시작일로 고정한다.
+ * 오늘의 단어가 날짜에서 나오도록 바뀌면서, 고정하지 않으면 이 파일의 기대값이
+ * 매일 달라진다. kstToday() 가 이 환경변수를 먼저 본다 (lib/date.ts).
+ */
+beforeAll(() => vi.stubEnv('VITE_MOCK_TODAY', CURRICULUM_START));
+afterAll(() => vi.unstubAllEnvs());
 
 function renderToday() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
@@ -30,7 +39,7 @@ describe('오늘 화면', () => {
     renderToday();
     expect(await screen.findByText('grocery')).toBeInTheDocument();
     expect(screen.getByText('식료품')).toBeInTheDocument();
-    expect(screen.getByText('1 / 12')).toBeInTheDocument();
+    expect(screen.getByText('1 / 3')).toBeInTheDocument(); // 하루 세 단어
   });
 
   it('다음 단어로 넘어간다', async () => {
@@ -39,7 +48,7 @@ describe('오늘 화면', () => {
 
     await userEvent.click(screen.getByRole('button', { name: '다음 단어' }));
     expect(await screen.findByText('appointment')).toBeInTheDocument();
-    expect(screen.getByText('2 / 12')).toBeInTheDocument();
+    expect(screen.getByText('2 / 3')).toBeInTheDocument();
   });
 
   it('첫 단어에서 이전을 누르면 마지막 단어로 순환한다', async () => {
@@ -47,8 +56,8 @@ describe('오늘 화면', () => {
     await screen.findByText('grocery');
 
     await userEvent.click(screen.getByRole('button', { name: '이전 단어' }));
-    expect(await screen.findByText('chilly')).toBeInTheDocument();
-    expect(screen.getByText('12 / 12')).toBeInTheDocument();
+    expect(await screen.findByText('receipt')).toBeInTheDocument();
+    expect(screen.getByText('3 / 3')).toBeInTheDocument();
   });
 
   it('즐겨찾기를 토글하면 즉시 반영되고 토스트가 뜬다', async () => {

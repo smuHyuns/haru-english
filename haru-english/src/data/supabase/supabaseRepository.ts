@@ -1,5 +1,5 @@
 import { PER_DAY } from '@/lib/constants';
-import { deriveVideoForDay } from '@/lib/curriculum';
+import { deriveVideoForDay, wordStartIndex } from '@/lib/curriculum';
 import { addDays, daysInMonth, kstToday, parseDate, toDateStr } from '@/lib/date';
 
 import type { Repository } from '../repository';
@@ -64,6 +64,36 @@ function toVideo(r: VideoRow): Video {
   };
 }
 
+/**
+ * daily_words 가 비어 있는 날의 폴백.
+ *
+ * 목처럼 카탈로그를 통째로 받아 자르지 않는다 — 단어가 1440개라
+ * 폴백 한 번에 1440행을 내려받게 된다. 개수만 세고 필요한 3행만 range 로 집는다.
+ */
+async function fallbackWordsForDay(date: DateStr): Promise<Word[]> {
+  const sb = getSupabase();
+  const { count, error } = await sb.from('words').select('id', { count: 'exact', head: true });
+  if (error) throw new Error(`단어 개수: ${error.message}`);
+  if (!count) return [];
+
+  const start = wordStartIndex(date, count);
+  const take = async (from: number, n: number) =>
+    unwrap(
+      await sb
+        .from('words')
+        .select(WORD_COLS)
+        .order('sort_order')
+        .range(from, from + n - 1)
+        .returns<WordRow[]>(),
+      '단어 폴백',
+    );
+
+  const head = await take(start, PER_DAY);
+  // 카탈로그 끝을 넘어가면 앞쪽에서 마저 채운다 (range 는 감싸주지 않는다)
+  const rest = head.length < PER_DAY ? await take(0, PER_DAY - head.length) : [];
+  return [...head, ...rest].map(toWord).slice(0, PER_DAY);
+}
+
 /** PostgREST 에러를 그대로 던진다 — 빈 배열로 삼키면 장애가 '데이터 없음'으로 보인다 */
 function unwrap<T>(res: { data: T | null; error: { message: string } | null }, what: string): T {
   if (res.error) throw new Error(`${what}: ${res.error.message}`);
@@ -79,12 +109,33 @@ export const supabaseRepository: Repository = {
    *      오늘치 3개만 주면 다른 날 즐겨찾기한 단어가 목록에서 사라진다.
    * 단어가 수백 개로 늘면 getWordsByIds 를 따로 만들고 여기를 쪼개야 한다.
    */
-  async getTodayWords(): Promise<Word[]> {
+  async getWordsByIds(ids: string[]): Promise<Word[]> {
+    if (ids.length === 0) return []; // 빈 in() 은 PostgREST 에서 문법 오류가 된다
     const rows = unwrap(
-      await getSupabase().from('words').select(WORD_COLS).order('sort_order').returns<WordRow[]>(),
-      '단어 목록',
+      await getSupabase()
+        .from('words')
+        .select(WORD_COLS)
+        .in('id', ids)
+        .order('sort_order')
+        .returns<WordRow[]>(),
+      '단어 조회',
     );
     return rows.map(toWord);
+  },
+
+  async getVideosByIds(ids: string[]): Promise<Video[]> {
+    if (ids.length === 0) return [];
+    const rows = unwrap(
+      await getSupabase()
+        .from('videos')
+        .select(VIDEO_COLS)
+        .in('id', ids)
+        .order('category_id')
+        .order('sort_order')
+        .returns<VideoRow[]>(),
+      '영상 조회',
+    );
+    return rows.map(toVideo);
   },
 
   async getWordsByDate(date: DateStr): Promise<Word[]> {
@@ -103,7 +154,7 @@ export const supabaseRepository: Repository = {
 
     // 폴백 — 커리큘럼(daily_words)이 그 날짜까지 안 채워진 경우.
     // mock 과 같은 결정론적 규칙으로 채워 화면이 비지 않게 한다.
-    return deriveWordsForDay(date, await supabaseRepository.getTodayWords());
+    return fallbackWordsForDay(date);
   },
 
   async getCategories(): Promise<Category[]> {
@@ -266,12 +317,3 @@ async function setFavorite(
   if (error) throw new Error(`즐겨찾기 ${on ? '추가' : '해제'}: ${error.message}`);
 }
 
-/** 프로토타입 규칙 WORDS[(일자 * PER_DAY + slot) % total] — mock 의 wordsForDay 와 같은 식 */
-export function deriveWordsForDay(date: DateStr, catalog: Word[]): Word[] {
-  if (catalog.length === 0) return [];
-  const { day } = parseDate(date);
-  return Array.from(
-    { length: PER_DAY },
-    (_, slot) => catalog[(day * PER_DAY + slot) % catalog.length]!,
-  );
-}

@@ -13,6 +13,7 @@ migrations/20260829000003_profile_trigger.sql 가입 시 profiles 자동 생성
 migrations/20260830000001_daily_videos.sql    일자별 영상 커리큘럼 + videos.sort_order
 seed.sql                                      단어·카테고리 시드
 seed_youtube.sql                              유튜브 콘텐츠 439개 + 409일치 영상 커리큘럼
+seed_words.sql                                영단어 1426개 + 477일치 단어 커리큘럼
 ```
 
 전부 idempotent 하다 (`if not exists` / `on conflict do nothing|do update` / `drop policy if exists`).
@@ -23,9 +24,13 @@ seed_youtube.sql                              유튜브 콘텐츠 439개 + 409�
 > `hospital`)를 지우고 실제 카테고리로 갈아끼우기 때문이다.
 > `favorite_videos` 는 `on delete cascade` 라 `v1~v6` 에 걸린 즐겨찾기도 함께 사라진다.
 
+> `seed_words.sql` 도 `seed.sql` **뒤에** 돌린다. 기존 12개 단어의 손으로 쓴 표기는
+> 건드리지 않고 `sort_order` 만 갱신한 뒤, `daily_words` 를 전부 다시 만든다.
+
 ### 방법 A — 대시보드 SQL Editor
 
-위 6개 파일을 **순서대로** 붙여넣고 실행. 지금은 이게 가장 빠르다.
+위 7개 파일을 **순서대로** 붙여넣고 실행. 지금은 이게 가장 빠르다.
+`seed_words.sql` 은 137KB 라 붙여넣기가 좀 걸린다.
 
 ### 방법 B — CLI (재현 가능, 권장)
 
@@ -67,10 +72,10 @@ select tablename, rowsecurity from pg_tables
 where schemaname = 'public' order by tablename;
 
 -- 시드
-select (select count(*) from words)        as words,        -- 12
+select (select count(*) from words)        as words,        -- 1430
        (select count(*) from videos)       as videos,       -- 439
        (select count(*) from categories)   as categories,   -- 4 ('전체' 는 UI 개념이라 DB 에 없다)
-       (select count(*) from daily_words)  as daily_words,  -- (오늘 + 30일 - 2026-05-01) * 3
+       (select count(*) from daily_words)  as daily_words,  -- 1431 (477일 × 3)
        (select count(*) from daily_videos) as daily_videos; -- 409 (2026-05-01 ~ 2027-06-13)
 
 -- 카테고리별 영상 수 — daily 409 / pack 26 / speaking 2 / study 2
@@ -109,6 +114,36 @@ select v.title, v.channel from daily_videos d
 
 커리큘럼이 2027-06-13 에 끝나면 어댑터가 `deriveVideoForDay` 순환 폴백으로 떨어진다
 (`src/lib/curriculum.ts`). 화면이 비지는 않지만, 그 전에 이 시드를 갱신하는 편이 낫다.
+
+## 영단어 (`seed_words.sql`)
+
+출처는 같은 `mds/youtube.md` 의 마지막 항목 —
+`q88YW7elHOM` "영어 단어 1500개 · 중등 필수 영단어" (3시간 26분).
+
+자막에는 **영단어만** 들어 있다. 뜻과 발음기호는 화면에만 표시되고 음성에는 없다
+(설명란의 오류공지 `736. stripe [straɪp; 스트라이프] 줄무늬` 가 화면 표기 형식을 알려 준다).
+그래서 필드마다 출처가 다르다.
+
+| 필드 | 출처 |
+|---|---|
+| `en` | 자막에서 추출 — 1500슬롯 중 중복·유실을 빼고 **1426개** 복원 |
+| `ipa` | CMUdict(ARPABET)에서 기계 생성 |
+| `ko` · `ex_en` · `ex_ko` | 영상에 없는 정보라 **직접 작성** |
+
+추출 방법: 설명란의 100단어 단위 챕터로 약 8.2초짜리 시간 격자를 만들고, 영상이 한 단어를
+3번 읽는 특성을 이용해 각 슬롯에서 반복 3회 이상인 구간을 정답으로 골랐다. 그 뒤
+CMUdict 표제어 대조로 걸러 냈다 — 1443개 중 9개만 미등재였고, 앞뒤 알파벳 순서와 원본
+발음으로 8개를 복원했다(`receip`→receipt, `13`→thirteen, `adist`→adjust, `begag`→baggage 등).
+복원되지 않는 조각 15개는 짐작으로 채우지 않고 버렸다.
+
+IPA 생성기는 기존에 손으로 쓴 12개를 회귀 테스트로 삼았다. 9개가 표기까지 정확히 일치하고,
+안 맞는 2개는 `refund`(CMUdict 첫 항목이 동사형 rɪˈfʌnd, 사전 표기는 명사형 ˈriː.fʌnd)와
+`leftover`(복합어 경계라 ˈlef.toʊ.vər 로 쪼개짐)로 둘 다 틀린 발음은 아니다.
+
+**커리큘럼 규칙이 바뀌었다.** 프로토타입은 `WORDS[(일자 * 3 + slot) % 12]` 였는데, '일'(1~31)로만
+인덱싱해서 인덱스가 95 를 넘지 못한다. 단어가 12개일 땐 문제가 없었지만 1430개에서는
+카탈로그의 93% 가 영영 나오지 않는다. 지금은 커리큘럼 시작일부터 하루 3개씩 순서대로
+소진한다 (477일치). 어댑터 폴백도 같은 규칙이다 — `src/lib/curriculum.ts`.
 
 ## RLS 검증 (Phase 6 DoD)
 

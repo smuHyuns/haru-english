@@ -17,11 +17,16 @@ import type {
  * 메서드 구성은 핸드오프 README 의 REST 스펙과 1:1 로 맞췄다.
  */
 export interface Repository {
-  /** GET /words/today — 홈에서 순환할 오늘의 추천 단어 */
-  getTodayWords(): Promise<Word[]>;
-
   /** GET /words/by-date — 그날 배운 단어 (하루 PER_DAY 개) */
   getWordsByDate(date: DateStr): Promise<Word[]>;
+
+  /**
+   * 즐겨찾기 해석용. 예전에는 화면이 카탈로그를 통째로 받아 filter 했는데,
+   * 단어가 1440개·영상이 439개가 되면서 즐겨찾기 몇 개를 그리자고
+   * 목록 전체를 내려받는 꼴이 됐다.
+   */
+  getWordsByIds(ids: string[]): Promise<Word[]>;
+  getVideosByIds(ids: string[]): Promise<Video[]>;
 
   getCategories(): Promise<Category[]>;
 

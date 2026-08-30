@@ -1,7 +1,35 @@
-import type { DateStr, Video } from '@/data/types';
+import type { DateStr, Video, Word } from '@/data/types';
 
-import { CURRICULUM_START } from './constants';
+import { CURRICULUM_START, PER_DAY } from './constants';
 import { daysBetween } from './date';
+
+/** 커리큘럼 N일차 (시작일이 0일차). 음수도 그대로 돌려준다 */
+export function dayIndex(date: DateStr): number {
+  return daysBetween(CURRICULUM_START, date);
+}
+
+/** 목록 길이에 맞춰 감싼 인덱스. 음수 나머지를 한 번 더 정규화한다 */
+export function wrap(i: number, len: number): number {
+  return ((i % len) + len) % len;
+}
+
+/**
+ * 그날 배울 단어의 카탈로그 내 시작 위치.
+ * 하루 PER_DAY 개씩 앞으로 나아간다 — 단어가 1440개면 480일치 커리큘럼이 된다.
+ *
+ * 프로토타입은 `일자 * 3 + slot` 이라 '일'(1~31)만 썼다. 단어가 12개일 땐 문제가
+ * 없었지만 1440개가 되면 인덱스가 95 를 넘지 못해 카탈로그의 93% 를 못 쓴다.
+ */
+export function wordStartIndex(date: DateStr, total: number): number {
+  return wrap(dayIndex(date) * PER_DAY, total);
+}
+
+/** 커리큘럼이 떨어진 날의 단어 폴백 — 카탈로그를 순환한다 */
+export function deriveWordsForDay(date: DateStr, catalog: Word[]): Word[] {
+  if (catalog.length === 0) return [];
+  const start = wordStartIndex(date, catalog.length);
+  return Array.from({ length: PER_DAY }, (_, slot) => catalog[wrap(start + slot, catalog.length)]!);
+}
 
 /**
  * 커리큘럼이 떨어진 날의 폴백 — 목록을 순환시킨다.
@@ -14,7 +42,5 @@ import { daysBetween } from './date';
  */
 export function deriveVideoForDay(date: DateStr, catalog: Video[]): Video | null {
   if (catalog.length === 0) return null;
-  const n = daysBetween(CURRICULUM_START, date);
-  // 시작일 이전 날짜면 n 이 음수라 나머지도 음수가 된다 — 한 번 더 더해 정규화
-  return catalog[((n % catalog.length) + catalog.length) % catalog.length]!;
+  return catalog[wrap(dayIndex(date), catalog.length)]!;
 }

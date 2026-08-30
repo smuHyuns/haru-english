@@ -8,11 +8,9 @@ import { qk } from '@/query/keys';
 
 /* ── 읽기 ────────────────────────────────────────────── */
 
+/** 오늘의 단어 PER_DAY 개. 예전엔 카탈로그 전체였고 홈 카운터가 '1 / 12' 였다 */
 export function useTodayWords() {
-  return useQuery({
-    queryKey: qk.todayWords(),
-    queryFn: () => repo.getTodayWords(),
-  });
+  return useWordsByDate(kstToday());
 }
 
 export function useWordsByDate(date: DateStr | null) {
@@ -73,6 +71,31 @@ export function useFavorites() {
   return useQuery({
     queryKey: qk.favorites(),
     queryFn: () => repo.getFavorites(),
+  });
+}
+
+/*
+ * 즐겨찾기 화면용.
+ * 예전에는 단어·영상 카탈로그를 통째로 받아 filter 했다. 콘텐츠가 12개·6개일 땐
+ * 괜찮았지만 지금은 1440개·439개다. 즐겨찾기한 것만 골라 받는다.
+ */
+export function useFavoriteWords() {
+  const { data: favorites } = useFavorites();
+  const ids = favorites?.words ?? [];
+  return useQuery({
+    queryKey: qk.wordsByIds(ids),
+    queryFn: () => repo.getWordsByIds(ids),
+    enabled: favorites !== undefined,
+  });
+}
+
+export function useFavoriteVideos() {
+  const { data: favorites } = useFavorites();
+  const ids = favorites?.videos ?? [];
+  return useQuery({
+    queryKey: qk.videosByIds(ids),
+    queryFn: () => repo.getVideosByIds(ids),
+    enabled: favorites !== undefined,
   });
 }
 

@@ -1,5 +1,5 @@
 import { PER_DAY } from '@/lib/constants';
-import { deriveVideoForDay } from '@/lib/curriculum';
+import { deriveVideoForDay, deriveWordsForDay } from '@/lib/curriculum';
 import { addDays, daysInMonth, kstToday, parseDate } from '@/lib/date';
 
 import type { Repository } from '../repository';
@@ -22,14 +22,9 @@ import { CATEGORIES, JOINED_AT, SEED_FAVORITES, VIDEOS, WORDS } from './content'
  * 테스트에서도 계속 쓴다. 쓰기는 메모리에만 반영된다 (새로고침하면 시드로 복귀).
  */
 
-/** 프로토타입과 같은 결정론적 규칙: WORDS[(일자 * 3 + slot) % 12] */
+/** 커리큘럼 규칙은 supabase 어댑터와 공유한다 (lib/curriculum.ts) */
 function wordsForDay(date: DateStr): Word[] {
-  const { day } = parseDate(date);
-  return Array.from({ length: PER_DAY }, (_, slot) => {
-    const w = WORDS[(day * PER_DAY + slot) % WORDS.length];
-    // WORDS 는 비어 있지 않으므로 항상 존재한다
-    return w!;
-  });
+  return deriveWordsForDay(date, WORDS);
 }
 
 /**
@@ -95,12 +90,16 @@ function createMockRepository(): MockRepository {
   return {
     __reset: reset,
 
-    async getTodayWords(): Promise<Word[]> {
-      return WORDS;
-    },
-
     async getWordsByDate(date: DateStr): Promise<Word[]> {
       return wordsForDay(date);
+    },
+
+    async getWordsByIds(ids: string[]): Promise<Word[]> {
+      return WORDS.filter((w) => ids.includes(w.id));
+    },
+
+    async getVideosByIds(ids: string[]): Promise<Video[]> {
+      return VIDEOS.filter((v) => ids.includes(v.id));
     },
 
     async getCategories(): Promise<Category[]> {
