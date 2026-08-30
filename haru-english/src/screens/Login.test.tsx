@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import ToastProvider from '@/components/ToastProvider';
+import { rememberIdentifier } from '@/auth/lastIdentifier';
 import { useSession } from '@/store/session';
 
 import Login from './Login';
@@ -127,5 +128,49 @@ describe('회원가입 모드', () => {
 
     await userEvent.click(screen.getByRole('button', { name: '회원가입' }));
     await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+  });
+});
+
+describe('아이디 저장', () => {
+  it('로그인에 성공한 아이디를 다음 방문에 채워 준다', async () => {
+    const first = renderLogin();
+    await userEvent.type(id(), 'minsu99');
+    await userEvent.type(pw(), 'password123');
+    await userEvent.click(screen.getByRole('button', { name: '로그인' }));
+    await waitFor(() => expect(useSession.getState().mode).toBe('user'));
+    first.unmount();
+
+    renderLogin();
+    expect(id()).toHaveValue('minsu99');
+    // 비밀번호는 절대 남기지 않는다
+    expect(pw()).toHaveValue('');
+  });
+
+  it('로그인까지 가지 못한 입력은 기억하지 않는다', async () => {
+    const first = renderLogin();
+    await userEvent.type(id(), 'minsu99');
+    await userEvent.type(pw(), '123');
+    await userEvent.click(screen.getByRole('button', { name: '로그인' }));
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    first.unmount();
+
+    renderLogin();
+    expect(id()).toHaveValue('');
+  });
+
+  it('둘러보기는 아이디를 남기지 않는다', async () => {
+    const first = renderLogin();
+    await userEvent.click(screen.getByRole('button', { name: '로그인 없이 둘러보기' }));
+    await waitFor(() => expect(useSession.getState().mode).toBe('guest'));
+    first.unmount();
+
+    renderLogin();
+    expect(id()).toHaveValue('');
+  });
+
+  it('가입 모드로 들어오면 채우지 않는다', () => {
+    rememberIdentifier('minsu99');
+    renderLogin('/login?mode=signup');
+    expect(id()).toHaveValue('');
   });
 });

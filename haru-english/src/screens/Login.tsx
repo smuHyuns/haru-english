@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import Button from '@/components/Button';
 import { checkPassword, toEmail } from '@/auth/identifier';
+import { readIdentifier, rememberIdentifier } from '@/auth/lastIdentifier';
 import { useSession } from '@/store/session';
 
 import styles from './Login.module.css';
@@ -29,7 +30,12 @@ export default function Login() {
   const setError = useSession.setState;
   const clearError = useSession((s) => s.clearError);
 
-  const [id, setId] = useState('');
+  /*
+   * 지난번 아이디를 채워 둔다 — 다시 들어올 때 타이핑을 한 칸 줄인다.
+   * 가입 모드로 바로 들어온 경우는 비운다. 남의 아이디로 가입을 시도하게 만들 이유가 없다.
+   * 마운트 때 한 번만 읽는다. 모드를 오갈 때마다 입력칸이 제멋대로 바뀌면 더 헷갈린다.
+   */
+  const [id, setId] = useState(() => (isSignup ? '' : (readIdentifier() ?? '')));
   const [pw, setPw] = useState('');
 
   // 모드를 바꾸면 이전 모드의 오류 문구가 남지 않게 한다
@@ -49,7 +55,10 @@ export default function Login() {
     }
 
     const ok = await (isSignup ? signUp(id, pw) : signIn(id, pw));
-    if (ok) navigate('/today', { replace: true });
+    if (!ok) return;
+    // 성공한 아이디만 기억한다. 오타를 저장해 두면 다음번에 그 오타로 시작한다
+    rememberIdentifier(id);
+    navigate('/today', { replace: true });
   };
 
   const browse = async () => {
